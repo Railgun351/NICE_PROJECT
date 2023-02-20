@@ -1,4 +1,4 @@
-package Project;
+package Project.DB_Function;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,6 +7,9 @@ import java.sql.ResultSetMetaData;
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.table.DefaultTableModel;
+
+import Project.Bean.ProductBean;
+import Project.Bean.StatisBean;
 
 public class ShopMgr {
 	private DBConnectionMgr pool;
@@ -23,38 +26,44 @@ public class ShopMgr {
         return shopMgr;
     }
 
-	public void selectPro(String Cate, DefaultTableModel dtm) {
+	public Vector<ProductBean> selectPro(String Cate, DefaultTableModel dtm) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		String sql = null;
+		Vector<ProductBean> pbv = new Vector<>();
 		dtm.setNumRows(0);
 		try {
 			con = pool.getConnection();
 			if (Cate != "전체") {
-				sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_name as 카테고리, p.price as 가격, p.inventory as 현재재고량\n"
+				sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_name as 카테고리, p.price as 가격, p.inventory as 현재재고량, p.IMG_ADDRESS\n"
 						+ "FROM product p, category c " + "WHERE p.category_id = c.cat_idx AND c.cat_name = ?";
 				pstmt = con.prepareStatement(sql);
 				pstmt.setString(1, Cate);
 			} else {
-				sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_name as 카테고리, p.price as 가격, p.inventory as 현재재고량 "
+				sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_name as 카테고리, p.price as 가격, p.inventory as 현재재고량, p.IMG_ADDRESS "
 						+ "FROM product p, category c " + "WHERE p.category_id = c.cat_idx";
 				pstmt = con.prepareStatement(sql);
 			}
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				Vector<Object> data = new Vector<>();
+				ProductBean pb = new ProductBean();
 				data.add(rs.getInt(1));
 				data.add(rs.getString(2));
 				data.add(rs.getString(3));
 				data.add(rs.getInt(4));
 				data.add(rs.getInt(5));
+				pb.setPRO_IDX(rs.getInt(1));
+				pb.setIMG_ADDRESS(rs.getString(6));
 				dtm.addRow(data);
+				pbv.add(pb);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			pool.freeConnection(con, pstmt);
 		}
+		return pbv;
 	}
 
 	public void selectCate(DefaultComboBoxModel<String> dcbm) {
@@ -82,20 +91,39 @@ public class ShopMgr {
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		String sql = null;
-		int updatestmt = 0;
+		int updateAmount = 0;
 		try {
 			con = pool.getConnection();
 			sql = "update product set inventory = inventory + ? where PRO_IDX = ?";
 			pstmt = con.prepareStatement(sql);
 			pstmt.setInt(1, inven);
 			pstmt.setInt(2, idx);
-			updatestmt = pstmt.executeUpdate();
+			updateAmount = pstmt.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			pool.freeConnection(con, pstmt);
 		}
-		return updatestmt > 0 ? true:false;
+		return updateAmount > 0 ? true:false;
+	}
+	
+	public boolean deletePro(int idx) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		int updateAmount = 0;
+		try {
+			con = pool.getConnection();
+			sql = "delete from PRODUCT where PRO_IDX = ?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, idx);
+			updateAmount = pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+		return updateAmount > 0 ? true:false;
 	}
 	
 	public Vector<StatisBean> selectCateSt() {

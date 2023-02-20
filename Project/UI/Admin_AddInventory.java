@@ -1,4 +1,4 @@
-package Project;
+package Project.UI;
 
 import java.awt.EventQueue;
 
@@ -6,6 +6,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+
+import Project.Bean.ProductBean;
+import Project.DB_Function.ShopMgr;
+
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JScrollPane;
@@ -19,6 +23,7 @@ import javax.swing.SwingConstants;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -31,6 +36,7 @@ import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.security.PublicKey;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -53,6 +59,7 @@ public class Admin_AddInventory extends JFrame {
 	ShopMgr sm;
 	private int Pro_idx = -1;
 	private BufferedImage bgi = null;
+	private Vector<ProductBean> pbv = new Vector<>();
 	private ImageIcon icon = new ImageIcon("IMG\\addInven.png");
 	private Image img = icon.getImage();
 	private Admin_AddInventory aa;
@@ -116,6 +123,10 @@ public class Admin_AddInventory extends JFrame {
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(34, 92, 475, 341);
 		lp.add(scrollPane);
+		
+		JLabel lblNewLabel_1 = new JLabel("");
+		lblNewLabel_1.setBounds(55, 541, 172, 146);
+		lp.add(lblNewLabel_1);
 
 		table = new JTable(dtm) {
 			public boolean isCellEditable(int row, int column) {
@@ -135,13 +146,19 @@ public class Admin_AddInventory extends JFrame {
 				textField.setText((String) table.getModel().getValueAt(row, 1));
 				textField_1.setText("카테고리: " + (String) table.getModel().getValueAt(row, 2));
 				textField_2.setText(Integer.toString((int) table.getModel().getValueAt(row, 3)) + "원");
+				for (int i = 0; i < pbv.size(); i++) {
+//					if (pbv.get(i).getPRO_IDX()) {
+//						
+//					}
+				}
+				lblNewLabel_1.setIcon(new ImageIcon());
 			}
 		});
 
 		scrollPane.setViewportView(table);
 
 		textField = new JTextField();
-		textField.setBounds(55, 483, 172, 40);
+		textField.setBounds(55, 471, 172, 20);
 		lp.add(textField);
 		textField.setEditable(false);
 		textField.setColumns(10);
@@ -149,7 +166,7 @@ public class Admin_AddInventory extends JFrame {
 		textField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 
 		textField_1 = new JTextField();
-		textField_1.setBounds(55, 562, 172, 40);
+		textField_1.setBounds(55, 491, 172, 20);
 		lp.add(textField_1);
 		textField_1.setEditable(false);
 		textField_1.setColumns(10);
@@ -157,7 +174,7 @@ public class Admin_AddInventory extends JFrame {
 		textField_1.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 
 		textField_2 = new JTextField();
-		textField_2.setBounds(55, 637, 172, 40);
+		textField_2.setBounds(55, 511, 172, 20);
 		lp.add(textField_2);
 		textField_2.setEditable(false);
 		textField_2.setColumns(10);
@@ -182,21 +199,47 @@ public class Admin_AddInventory extends JFrame {
 		btn_Confirm.setFocusPainted(false);
 		btn_Confirm.setBorderPainted(false);
 		btn_Confirm.setContentAreaFilled(false);
-		btn_Confirm.setBounds(310, 619, 153, 69);
-		lp.add(btn_Confirm);
+		btn_Confirm.setBounds(284, 637, 104, 50);
 		btn_Confirm.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (sm.updateInven(Pro_idx, (int) spinner.getValue())) {
-					JOptionPane.showMessageDialog(null, "성공적으로 재고가 추가되었습니다.", "성공", JOptionPane.PLAIN_MESSAGE);
+					JOptionPane.showMessageDialog(null, "성공적으로 재고가 갱신되었습니다.", "성공", JOptionPane.INFORMATION_MESSAGE);
 					String cate = (String) comboBox.getSelectedItem();
 					updateTable(cate, dtm);
 				} else {
-					JOptionPane.showMessageDialog(null, "재고 추가중에 문제가 발생했습니다.\n다시 확인해주세요.", "오류",
+					JOptionPane.showMessageDialog(null, "재고 갱신중에 문제가 발생했습니다.\n다시 확인해주세요.", "오류",
 							JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
+		lp.add(btn_Confirm);
+		
+		JButton btn_Delete = new JButton("");
+		btn_Delete.setFocusPainted(false);
+		btn_Delete.setContentAreaFilled(false);
+		btn_Delete.setBorderPainted(false);
+		btn_Delete.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		btn_Delete.setBounds(400, 637, 97, 50);
+		btn_Delete.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int selected = JOptionPane.showConfirmDialog(null, "선택한 상품을 삭제합니다. 정말로 삭제하시겠습니까?","주의",JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				if (selected == 0) {
+					if (sm.deletePro(Pro_idx)) {
+						JOptionPane.showMessageDialog(null, "성공적으로 상품이 삭제되었습니다.", "성공", JOptionPane.INFORMATION_MESSAGE);
+						String cate = (String) comboBox.getSelectedItem();
+						updateTable(cate, dtm);
+					} else {
+						JOptionPane.showMessageDialog(null, "상품 삭제중에 문제가 발생했습니다.\n다시 확인해주세요.", "오류",
+								JOptionPane.ERROR_MESSAGE);
+					}
+				} else {
+					JOptionPane.showMessageDialog(null, "상품 삭제를 취소했습니다.","안내",JOptionPane.INFORMATION_MESSAGE);
+				}
+			}
+		});
+		lp.add(btn_Delete);
 //		btnNewButton_2.setBorderPainted(false);
 //		btnNewButton_2.setFocusPainted(false);
 		table.updateUI();
@@ -212,7 +255,7 @@ public class Admin_AddInventory extends JFrame {
 	}
 
 	public void updateTable(String Cate, DefaultTableModel dtm) {
-		sm.selectPro(Cate, dtm);
+		pbv = sm.selectPro(Cate, dtm);
 		table.updateUI();
 	}
 }

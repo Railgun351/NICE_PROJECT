@@ -1,10 +1,14 @@
-package Project;
+package Project.UI;
 
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import Project.Bean.StatisBean;
+import Project.DB_Function.ShopMgr;
+
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import javax.swing.JLayeredPane;
@@ -147,7 +151,6 @@ public class Admin_Statistics extends JFrame {
 		btn_Search.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("실행");
 				int type = 0;
 				if (rdbtnNewRadioButton.isSelected()) {
 					type = 0;

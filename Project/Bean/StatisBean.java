@@ -1,4 +1,4 @@
-package Project;
+package Project.Bean;
 
 public class StatisBean {
 	private String cName;

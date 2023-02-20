@@ -1,4 +1,4 @@
-package Project;
+package Project.Bean;
 
 public class ProductBean {
 	private int PRO_IDX;
