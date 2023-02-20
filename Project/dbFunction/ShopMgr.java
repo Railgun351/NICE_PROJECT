@@ -1,4 +1,4 @@
-package Project.DB_Function;
+package project.dbFunction;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,8 +8,8 @@ import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.table.DefaultTableModel;
 
-import Project.Bean.ProductBean;
-import Project.Bean.StatisBean;
+import project.bean.ProductBean;
+import project.bean.StatisBean;
 
 public class ShopMgr {
 	private DBConnectionMgr pool;
@@ -40,7 +40,7 @@ public class ShopMgr {
 				pstmt = con.prepareStatement(sql);
 				pstmt.setString(1, Cate);
 			} else {
-				sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_name as 카테고리, p.price as 가격, p.inventory as 현재재고량, p.IMG_ADDRESS "
+				sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_name as 카테고리, p.price as 가격, p.inventory as 현재재고량, p.IMG_ADDRESS\n"
 						+ "FROM product p, category c " + "WHERE p.category_id = c.cat_idx";
 				pstmt = con.prepareStatement(sql);
 			}

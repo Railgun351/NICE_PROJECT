@@ -1,4 +1,4 @@
-package Project.UI;
+package project.ui;
 
 import java.awt.EventQueue;
 
@@ -6,8 +6,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import Project.Bean.StatisBean;
-import Project.DB_Function.ShopMgr;
+import project.bean.StatisBean;
+import project.dbFunction.ShopMgr;
 
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
@@ -222,7 +222,6 @@ public class Admin_Statistics extends JFrame {
 		JLabel lblNewLabel2 = new JLabel(won);
 		lblNewLabel2.setBounds(380, 15, 100, 20);
 		panel.add(lblNewLabel2);
-		
 		return panel;
 	}
 

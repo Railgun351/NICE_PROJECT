@@ -1,4 +1,4 @@
-package Project.UI;
+package project.ui;
 
 import java.awt.EventQueue;
 
@@ -7,8 +7,8 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-import Project.Bean.ProductBean;
-import Project.DB_Function.ShopMgr;
+import project.bean.ProductBean;
+import project.dbFunction.ShopMgr;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -53,16 +53,14 @@ public class Admin_AddInventory extends JFrame {
 	private JTextField textField;
 	private JTextField textField_1;
 	private JTextField textField_2;
+	private JLabel lblNewLabel_1;
 	private String Header[] = { "상품번호", "상품명", "카테고리", "가격", "현재재고량" };
 	private DefaultTableModel dtm = new DefaultTableModel(Header, 0);
 	private DefaultComboBoxModel<String> dcbm = new DefaultComboBoxModel(new String[] { "전체" });
 	ShopMgr sm;
 	private int Pro_idx = -1;
-	private BufferedImage bgi = null;
 	private Vector<ProductBean> pbv = new Vector<>();
 	private ImageIcon icon = new ImageIcon("IMG\\addInven.png");
-	private Image img = icon.getImage();
-	private Admin_AddInventory aa;
 
 	/**
 	 * Launch the application.
@@ -99,8 +97,8 @@ public class Admin_AddInventory extends JFrame {
 		setContentPane(contentPane);
 		contentPane.add(lp);
 		sm.selectCate(dcbm);
-
-		JLabel bgilb = new JLabel(new ImageIcon("C:\\Java\\eclipse-workspace\\NICE_PROJECT\\IMG\\addInven.png"));
+		
+		JLabel bgilb = new JLabel(icon);
 		bgilb.setBounds(0, 0, 550, 731);
 		bgilb.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 		contentPane.add(bgilb);
@@ -124,7 +122,9 @@ public class Admin_AddInventory extends JFrame {
 		scrollPane.setBounds(34, 92, 475, 341);
 		lp.add(scrollPane);
 		
-		JLabel lblNewLabel_1 = new JLabel("");
+		lblNewLabel_1 = new JLabel("");
+		lblNewLabel_1.setFont(new Font("돋움체", Font.BOLD, 20));
+		lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel_1.setBounds(55, 541, 172, 146);
 		lp.add(lblNewLabel_1);
 
@@ -141,17 +141,7 @@ public class Admin_AddInventory extends JFrame {
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				int row = table.getSelectedRow();
-				Pro_idx = (int) table.getModel().getValueAt(row, 0);
-				textField.setText((String) table.getModel().getValueAt(row, 1));
-				textField_1.setText("카테고리: " + (String) table.getModel().getValueAt(row, 2));
-				textField_2.setText(Integer.toString((int) table.getModel().getValueAt(row, 3)) + "원");
-				for (int i = 0; i < pbv.size(); i++) {
-//					if (pbv.get(i).getPRO_IDX()) {
-//						
-//					}
-				}
-				lblNewLabel_1.setIcon(new ImageIcon());
+				tableSelect();
 			}
 		});
 
@@ -250,7 +240,40 @@ public class Admin_AddInventory extends JFrame {
 				updateTable(cate, dtm);
 			}
 		});
+		updateTable("전체", dtm);
 		sm.selectPro("전체", dtm);
+		validate();
+	}
+	
+	public void tableSelect() {
+		int row = table.getSelectedRow();
+		String path = null;
+		Pro_idx = (int) table.getModel().getValueAt(row, 0);
+		textField.setText((String) table.getModel().getValueAt(row, 1));
+		textField_1.setText("카테고리: " + (String) table.getModel().getValueAt(row, 2));
+		textField_2.setText(Integer.toString((int) table.getModel().getValueAt(row, 3)) + "원");
+		for (int i = 0; i < pbv.size(); i++) {
+			System.out.println(Pro_idx + "/" + pbv.get(i).getPRO_IDX());
+			if (pbv.get(i).getPRO_IDX() == Pro_idx) {
+				path = pbv.get(i).getIMG_ADDRESS();
+				break;
+			}
+		}
+		if (path == null) {
+			lblNewLabel_1.setIcon(null);
+			lblNewLabel_1.setText("No Image");
+			System.out.println(1);
+		}
+		else {
+			lblNewLabel_1.setText("");
+			ImageIcon ic = new ImageIcon(path);
+			Image img = ic.getImage();
+			Image img2 = img.getScaledInstance(172, 146, Image.SCALE_SMOOTH);
+			ic = new ImageIcon(img2);
+			lblNewLabel_1.setIcon(ic);
+			System.out.println(path);
+		}
+		repaint();
 		validate();
 	}
 

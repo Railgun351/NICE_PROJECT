@@ -1,4 +1,4 @@
-package Project.Bean;
+package project.bean;
 
 public class ProductBean {
 	private int PRO_IDX;
