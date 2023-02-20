@@ -322,7 +322,7 @@
            
            JButton gotobarket = new JButton("");
            gotobarket.setIcon(new ImageIcon(ImgName+"CART.PNG"));
-           gotobarket.setBounds(370, 10, 31, 39);
+             gotobarket.setBounds(360, 10, 31, 39);
            background.add(gotobarket);
            gotobarket.addActionListener(new ActionListener() {
            	public void actionPerformed(ActionEvent e) {
