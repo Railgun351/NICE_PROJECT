@@ -1,30 +1,23 @@
 package project.ui;
+import java.awt.Button;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import project.bean.*;
-import java.awt.BorderLayout;
-import javax.swing.JScrollBar;
-import java.awt.Checkbox;
-import java.awt.Button;
 
 public class EWT extends JFrame {
     /**
@@ -43,14 +36,14 @@ public class EWT extends JFrame {
 
 
 
-
+    String ImgName =  "C:/Users/dita810/Downloads/wLSAKR/NICE_PROJECT/IMG/";
 
     public EWT() {
     	
     
  //백엔드 메인로직
     	   List<FactoryItemFromMenu> items = new ArrayList<>();
-	        items.add(FactoryItemFactory.createItem(1,"신발이름", 10000, "C:/Users/dita810/Desktop/myJava/SWING/src/bigshoose1.PNG"));
+	        items.add(FactoryItemFactory.createItem(1,"신발이름", 10000, ImgName+"bigshoose1.PNG"));
 	        items.add(FactoryItemFactory.createItem(1,"", 0, "photo2"));
 	        items.add(FactoryItemFactory.createItem(1,"", 0, "photo3"));
 	        FactoryItemFromMenu firstItem = items.get(0);
@@ -75,23 +68,23 @@ public class EWT extends JFrame {
 	        
 	        
 	        //리뷰이름 번호 댓글 날짜
-
-	        customers.add(new StarCustomer("마지막", 5, "이글은지우지마세요", new Date()));
-	        customers.add(new StarCustomer("김철수2", 1, "별루에요", new Date()));
-	        customers.add(new StarCustomer("박영희1", 2, "사이즈가작아요", new Date()));
-	        customers.add(new StarCustomer("박영희2", 2, "사이즈가작아요", new Date()));
-	        customers.add(new StarCustomer("박영희3", 2, "사이즈가작아요", new Date()));
-	        customers.add(new StarCustomer("박영희4", 2, "사이즈가작아요", new Date()));
-	        customers.add(new StarCustomer("삼식이1", 3, "좋아요", new Date()));
-	        customers.add(new StarCustomer("심식이2", 3, "좋아요", new Date()));
-	        customers.add(new StarCustomer("이민1", 4, "이뻐요", new Date()));
-	        customers.add(new StarCustomer("이민2", 4, "이뻐요", new Date()));
-	        customers.add(new StarCustomer("이민3", 4, "이뻐요", new Date()));
-	        customers.add(new StarCustomer("오민1", 5, "이뻐요", new Date()));
-	        customers.add(new StarCustomer("오민2", 5, "이뻐요", new Date()));
-	        customers.add(new StarCustomer("cnrk3", 4, "이뻐요", new Date()));
-	        customers.add(new StarCustomer("cnrk1", 5, "이뻐요", new Date()));
-	        customers.add(new StarCustomer("cnrk2", 5, "이뻐요", new Date()));
+	        	//고유번호 아이디 별점 내용 날짜
+	        customers.add(new StarCustomer(1,2, 5, "이글은지우지마세요", new Date()));
+	        customers.add(new StarCustomer(1,2, 1, "별루에요", new Date()));
+	        customers.add(new StarCustomer(1,2, 2, "사이즈가작아요", new Date()));
+	        customers.add(new StarCustomer(1,2, 2, "사이즈가작아요", new Date()));
+	        customers.add(new StarCustomer(1,2, 2, "사이즈가작아요", new Date()));
+	        customers.add(new StarCustomer(1,2, 2, "사이즈가작아요", new Date()));
+	        customers.add(new StarCustomer(1,2, 3, "좋아요", new Date()));
+	        customers.add(new StarCustomer(1,2, 3, "좋아요", new Date()));
+	        customers.add(new StarCustomer(1,2,4, "이뻐요", new Date()));
+	        customers.add(new StarCustomer(1,2, 4, "이뻐요", new Date()));
+	        customers.add(new StarCustomer(1,2, 4, "이뻐요", new Date()));
+	        customers.add(new StarCustomer(1,2, 5, "이뻐요", new Date()));
+	        customers.add(new StarCustomer(1,2, 5, "이뻐요", new Date()));
+	        customers.add(new StarCustomer(1,2, 4, "이뻐요", new Date()));
+	        customers.add(new StarCustomer(1,2, 5, "이뻐요", new Date()));
+	        customers.add(new StarCustomer(1,2, 5, "이뻐요", new Date()));
 	        System.out.println(); // 개행
 	        System.out.println(); // 개행
             System.out.println(); // 개행
@@ -136,17 +129,17 @@ public class EWT extends JFrame {
 	        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy년MM월dd일");
 	  //첫번째 요소 출력
 	        StarCustomer c1 = (StarCustomer) arr[arr.length-1];
-//	        System.out.println(c1.getName() + ": " + c1.getTargetScore() + " " + c1.getReview() + " " + dateFormat.format(c1.getDate()));
+	        System.out.println(c1.getName() + ": " + c1.getTargetScore() + " " + c1.getReview() + " " + dateFormat.format(c1.getDate()));
 
 	        // 두번째 요소 출력
    
 	        StarCustomer c2 = (StarCustomer) arr[arr.length-2];
-//	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
+	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
 
 	   
         
 
-        icon = new ImageIcon("C:/Users/dita810/Desktop/myJava/SWING/src/back1.PNG");
+        icon = new ImageIcon(ImgName+"back1.PNG");
        
         //배경 Panel 생성후 컨텐츠페인으로 지정      
         JPanel background = new JPanel() {
@@ -177,11 +170,11 @@ public class EWT extends JFrame {
       
         
         JLabel 게시판1이름 = new JLabel();
-        게시판1이름.setText(c1.getName());
+        게시판1이름.setText(Integer.toString(c1.getName()));
         게시판1이름.setBounds(12, 412, 57, 15);
         background.add(게시판1이름);
         
-        JLabel 게시판2이름 = new JLabel(c2.getName());
+        JLabel 게시판2이름 = new JLabel(Integer.toString(c2.getName()));
         게시판2이름.setBounds(12, 458, 57, 15);
         background.add(게시판2이름);
         JLabel 게시판2 = new JLabel(c2.getReview());
@@ -196,7 +189,7 @@ public class EWT extends JFrame {
         //-----------------------------------
        
         JButton basket = new JButton("");
-        basket.setIcon(new ImageIcon("C:/Users/dita810/Desktop/myJava/SWING/src/장바구니.PNG"));
+        basket.setIcon(new ImageIcon(ImgName+"장바구니.PNG"));
         basket.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		//장바구니담기
@@ -207,7 +200,7 @@ public class EWT extends JFrame {
         scrollPane = new JScrollPane(background);
         
         JButton immediatepurchase = new JButton("");
-        immediatepurchase.setIcon(new ImageIcon("C:/Users/dita810/Desktop/myJava/SWING/src/즉시구매.PNG"));
+        immediatepurchase.setIcon(new ImageIcon(ImgName+"즉시구매.PNG"));
         immediatepurchase.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		//즉시구매
@@ -237,12 +230,12 @@ public class EWT extends JFrame {
          	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
          	 
          	        게시판1.setText(c1.getReview());
-         	        게시판1이름.setText(c1.getName());
+         	        게시판1이름.setText(Integer.toString(c1.getName()));
          	        게시판별점1.setText(Integer.toString(c1.getTargetScore()));
          	       StarCustomer c2 = (StarCustomer) arr[arr.length-2];
          	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
          	        
-        	        게시판2이름.setText(c2.getName());
+        	        게시판2이름.setText(Integer.toString(c2.getName()));
         	        게시판별점2.setText(Integer.toString(c2.getTargetScore()));
         	        게시판2.setText(c2.getReview());
             	 
@@ -258,7 +251,7 @@ public class EWT extends JFrame {
             System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
             
             게시판1.setText(c1.getReview());
-            게시판1이름.setText(c1.getName());
+            게시판1이름.setText(Integer.toString(c1.getName()));
             게시판별점1.setText(Integer.toString(c1.getTargetScore()));
      
            게시판2이름.setText("");
@@ -302,12 +295,12 @@ public class EWT extends JFrame {
      	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
      	 
      	        게시판1.setText(c1.getReview());
-     	        게시판1이름.setText(c1.getName());
+     	        게시판1이름.setText(Integer.toString(c1.getName()));
      	        게시판별점1.setText(Integer.toString(c1.getTargetScore()));
      	       StarCustomer c2 = (StarCustomer) arr[arr.length-2];
      	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
      	        
-    	        게시판2이름.setText(c2.getName());
+    	        게시판2이름.setText(Integer.toString(c2.getName()));
     	        게시판별점2.setText(Integer.toString(c2.getTargetScore()));
     	        게시판2.setText(c2.getReview());
         	 
@@ -323,7 +316,7 @@ public class EWT extends JFrame {
         System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
         
         게시판1.setText(c1.getReview());
-        게시판1이름.setText(c1.getName());
+        게시판1이름.setText(Integer.toString(c1.getName()));
         게시판별점1.setText(Integer.toString(c1.getTargetScore()));
  
        게시판2이름.setText("");
@@ -369,8 +362,8 @@ public class EWT extends JFrame {
         
         
         
-        x_1.setIcon(new ImageIcon("C:/Users/dita810/Desktop/myJava/SWING/src/x.PNG"));
-        x_2.setIcon(new ImageIcon("C:/Users/dita810/Desktop/myJava/SWING/src/x.PNG"));
+        x_1.setIcon(new ImageIcon(ImgName+"x.PNG"));
+        x_2.setIcon(new ImageIcon(ImgName+"x.PNG"));
         x_1.setBounds(300, 426, 31, 34);
         background.add(x_1);
         
@@ -379,10 +372,10 @@ public class EWT extends JFrame {
         createReview.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		//로직추가
-        		  customers.add(new StarCustomer("김철수", 1, "별루에요", new Date()));
+        		  customers.add(new StarCustomer(1,2, 1, "별루에요", new Date()));
         	}
         });
-        createReview.setIcon(new ImageIcon("C:/Users/dita810/Desktop/myJava/SWING/src/리뷰작성.PNG"));
+        createReview.setIcon(new ImageIcon(ImgName+"리뷰작성.PNG"));
         createReview.setBounds(327, 378, 64, 23);
       
         background.add(createReview);
@@ -393,7 +386,7 @@ public class EWT extends JFrame {
         background.add(images);
         
         JButton gotobarket = new JButton("");
-        gotobarket.setIcon(new ImageIcon("C:/Users/dita810/Desktop/myJava/SWING/src/CART.PNG"));
+        gotobarket.setIcon(new ImageIcon(ImgName+"CART.PNG"));
         gotobarket.setBounds(370, 10, 31, 39);
         background.add(gotobarket);
         gotobarket.addActionListener(new ActionListener() {
@@ -407,12 +400,12 @@ public class EWT extends JFrame {
         		//로그아웃페이지
         	}
         });
-        logout.setIcon(new ImageIcon("C:/Users/dita810/Desktop/myJava/SWING/src/LOGOUT.PNG"));
+        logout.setIcon(new ImageIcon(ImgName+"LOGOUT.PNG"));
         logout.setBounds(327, 10, 31, 39);
         background.add(logout);
         
         JButton back = new JButton("");
-        back.setIcon(new ImageIcon("C:/Users/dita810/Desktop/myJava/SWING/src/BACK.PNG"));
+        back.setIcon(new ImageIcon(ImgName+"BACK.PNG"));
         back.setBounds(12, 10, 18, 39);
         back.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
@@ -457,7 +450,7 @@ public class EWT extends JFrame {
    	            	
    	            	
    	            	StarCustomer c = fourStarCustomers1.get(i);
-   	                result1[i][0] = c.getName();
+   	                result1[i][0] = Integer.toString(c1.getName());
    	                result1[i][1] = Integer.toString(c.getTargetScore());
    	                result1[i][2] = c.getReview();
    	            }
@@ -515,7 +508,7 @@ public class EWT extends JFrame {
    	            	
    	            	
    	            	StarCustomer c = fourStarCustomers1.get(i);
-   	                result1[i][0] = c.getName();
+   	                result1[i][0] = Integer.toString(c1.getName());
    	                result1[i][1] = Integer.toString(c.getTargetScore());
    	                result1[i][2] = c.getReview();
    	            }
@@ -563,7 +556,7 @@ public class EWT extends JFrame {
    	            	
    	            	
    	            	StarCustomer c = fourStarCustomers1.get(i);
-   	                result1[i][0] = c.getName();
+   	                result1[i][0] = Integer.toString(c1.getName());
    	                result1[i][1] = Integer.toString(c.getTargetScore());
    	                result1[i][2] = c.getReview();
    	            }
@@ -620,7 +613,7 @@ public class EWT extends JFrame {
    	            	
    	            	
    	            	StarCustomer c = fourStarCustomers1.get(i);
-   	                result1[i][0] = c.getName();
+   	                result1[i][0] =Integer.toString(c1.getName());
    	                result1[i][1] = Integer.toString(c.getTargetScore());
    	                result1[i][2] = c.getReview();
    	            }
@@ -671,7 +664,7 @@ public class EWT extends JFrame {
    	            	
    	            	
    	            	StarCustomer c = fourStarCustomers1.get(i);
-   	                result1[i][0] = c.getName();
+   	                result1[i][0] = Integer.toString(c1.getName());
    	                result1[i][1] = Integer.toString(c.getTargetScore());
    	                result1[i][2] = c.getReview();
    	            }
@@ -712,12 +705,12 @@ public class EWT extends JFrame {
             	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
             	        
             	        게시판1.setText(c1.getReview());
-            	        게시판1이름.setText(c1.getName());
+            	        게시판1이름.setText(Integer.toString(c1.getName()));
             	        게시판별점1.setText(Integer.toString(c1.getTargetScore()));
             	        StarCustomer c2 = (StarCustomer) arr[arr.length-2];
             	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
             	        
-           	        게시판2이름.setText(c2.getName());
+           	        게시판2이름.setText(Integer.toString(c2.getName()));
            	        게시판별점2.setText(Integer.toString(c2.getTargetScore()));
            	        게시판2.setText(c2.getReview());
                	 
@@ -731,7 +724,7 @@ public class EWT extends JFrame {
      	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
      	        
      	        게시판1.setText(c1.getReview());
-     	        게시판1이름.setText(c1.getName());
+     	        게시판1이름.setText(Integer.toString(c1.getName()));
      	        게시판별점1.setText(Integer.toString(c1.getTargetScore()));
      	       StarCustomer c2 = (StarCustomer) arr[arr.length-2];
      	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
@@ -772,12 +765,12 @@ public class EWT extends JFrame {
             	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
             	        
             	        게시판1.setText(c1.getReview());
-            	        게시판1이름.setText(c1.getName());
+            	        게시판1이름.setText(Integer.toString(c1.getName()));
             	        게시판별점1.setText(Integer.toString(c1.getTargetScore()));
             	        StarCustomer c2 = (StarCustomer) arr[arr.length-4];
             	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
             	        
-           	        게시판2이름.setText(c2.getName());
+           	        게시판2이름.setText(Integer.toString(c2.getName()));
            	        게시판별점2.setText(Integer.toString(c2.getTargetScore()));
            	        게시판2.setText(c2.getReview());
                	 
@@ -792,7 +785,7 @@ public class EWT extends JFrame {
            	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
            	        
            	        게시판1.setText(c1.getReview());
-           	        게시판1이름.setText(c1.getName());
+           	        게시판1이름.setText(Integer.toString(c1.getName()));
            	        게시판별점1.setText(Integer.toString(c1.getTargetScore()));
            	     StarCustomer c2 = (StarCustomer) arr[arr.length-4];
            	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
@@ -833,12 +826,12 @@ public class EWT extends JFrame {
             	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
             	        
             	        게시판1.setText(c1.getReview());
-            	        게시판1이름.setText(c1.getName());
+            	        게시판1이름.setText(Integer.toString(c1.getName()));
             	        게시판별점1.setText(Integer.toString(c1.getTargetScore()));
             	        StarCustomer c2 = (StarCustomer) arr[arr.length-6];
             	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
             	        
-           	        게시판2이름.setText(c2.getName());
+           	        게시판2이름.setText(Integer.toString(c2.getName()));
            	        게시판별점2.setText(Integer.toString(c2.getTargetScore()));
            	        게시판2.setText(c2.getReview());
                	 
@@ -851,7 +844,7 @@ public class EWT extends JFrame {
    			 Object[] arr = customers.toArray();
    	        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy년MM월dd일");
      	        게시판1.setText(c1.getReview());
-     	        게시판1이름.setText(c1.getName());
+     	        게시판1이름.setText(Integer.toString(c1.getName()));
      	        게시판별점1.setText(Integer.toString(c1.getTargetScore()));
      	       StarCustomer c2 = (StarCustomer) arr[arr.length-6];
      	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
@@ -893,12 +886,12 @@ public class EWT extends JFrame {
             	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
             	        
             	        게시판1.setText(c1.getReview());
-            	        게시판1이름.setText(c1.getName());
+            	        게시판1이름.setText(Integer.toString(c1.getName()));
             	        게시판별점1.setText(Integer.toString(c1.getTargetScore()));
             	        StarCustomer c2 = (StarCustomer) arr[arr.length-8];
             	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
             	        
-           	        게시판2이름.setText(c2.getName());
+           	        게시판2이름.setText(Integer.toString(c2.getName()));
            	        게시판별점2.setText(Integer.toString(c2.getTargetScore()));
            	        게시판2.setText(c2.getReview());
                	 
@@ -913,7 +906,7 @@ public class EWT extends JFrame {
            	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
            	        
            	        게시판1.setText(c1.getReview());
-           	        게시판1이름.setText(c1.getName());
+           	        게시판1이름.setText(Integer.toString(c1.getName()));
            	        게시판별점1.setText(Integer.toString(c1.getTargetScore()));
            	     StarCustomer c2 = (StarCustomer) arr[arr.length-8];
            	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
@@ -952,12 +945,12 @@ public class EWT extends JFrame {
               	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
               	        
               	        게시판1.setText(c1.getReview());
-              	        게시판1이름.setText(c1.getName());
+              	        게시판1이름.setText(Integer.toString(c1.getName()));
               	        게시판별점1.setText(Integer.toString(c1.getTargetScore()));
               	      StarCustomer c2 = (StarCustomer) arr[arr.length-10];
               	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
               	        
-             	        게시판2이름.setText(c2.getName());
+             	        게시판2이름.setText(Integer.toString(c2.getName()));
              	        게시판별점2.setText(Integer.toString(c2.getTargetScore()));
              	        게시판2.setText(c2.getReview());
                  	 
@@ -972,7 +965,7 @@ public class EWT extends JFrame {
              	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
              	        
              	        게시판1.setText(c1.getReview());
-             	        게시판1이름.setText(c1.getName());
+             	        게시판1이름.setText(Integer.toString(c1.getName()));
              	        게시판별점1.setText(Integer.toString(c1.getTargetScore()));
              	       StarCustomer c2 = (StarCustomer) arr[arr.length-10];
              	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
@@ -1020,12 +1013,12 @@ public class EWT extends JFrame {
        	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
        	        
        	        게시판1.setText(c1.getReview());
-       	        게시판1이름.setText(c1.getName());
+       	        게시판1이름.setText(Integer.toString(c1.getName()));
        	        게시판별점1.setText(Integer.toString(c1.getTargetScore()));
        	     StarCustomer c2 = (StarCustomer) arr[arr.length-12];
        	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
        	        
-      	        게시판2이름.setText(c2.getName());
+      	        게시판2이름.setText(Integer.toString(c2.getName()));
       	        게시판별점2.setText(Integer.toString(c2.getTargetScore()));
       	        게시판2.setText(c2.getReview());
           	 
@@ -1041,7 +1034,7 @@ public class EWT extends JFrame {
             	        System.out.println(c2.getName() + ": " + c2.getTargetScore() + " " + c2.getReview() + " " + dateFormat.format(c2.getDate()));
             	        
             	        게시판1.setText(c1.getReview());
-            	        게시판1이름.setText(c1.getName());
+            	        게시판1이름.setText(Integer.toString(c1.getName()));
             	        게시판별점1.setText(Integer.toString(c1.getTargetScore()));
             	 
             	        
