@@ -7,7 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import project.bean.StatisBean;
-import project.dbFunction.ShopMgr;
+import project.db.ShopMgr;
 
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;

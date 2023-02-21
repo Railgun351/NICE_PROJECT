@@ -8,7 +8,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import project.bean.ProductBean;
-import project.dbFunction.ShopMgr;
+import project.db.ShopMgr;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;

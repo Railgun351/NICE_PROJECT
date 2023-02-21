@@ -1,4 +1,4 @@
-package project.dbFunction;
+package project.db;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
