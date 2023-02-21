@@ -1,4 +1,4 @@
-package Project.Bean;
+package project.bean;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

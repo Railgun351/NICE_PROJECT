@@ -1,4 +1,4 @@
-package Project.Bean;
+package project.bean;
 import java.awt.Window.Type;
 import java.util.ArrayList;
 import java.util.List;

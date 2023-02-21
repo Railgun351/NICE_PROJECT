@@ -1,4 +1,4 @@
-package Project.Bean;
+package project.bean;
 public interface FactoryItemFromMenu {
 	 int getNum();
     String getName();
