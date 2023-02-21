@@ -3,11 +3,12 @@ package project.bean;
 import java.util.Date;
 
 public class StarCustomer implements StarObserver {
-    private String name;
+	private int  columnum;
+    private int name;
     private int targetScore;
     private String review;
     private Date date;
-    public StarCustomer(String name, int targetScore,String review,Date date) {
+    public StarCustomer(int columnum ,int Membername, int targetScore,String review,Date date) {
         this.name = name;
         this.targetScore = targetScore;
         this.review = review;
@@ -18,8 +19,10 @@ public class StarCustomer implements StarObserver {
             System.out.println(name + ": " + score +"  "+ "리뷰"+review);
         }
     }
-
-    public String getName() {
+    public int getcolumnum() {
+        return columnum;
+    }
+    public int getName() {
         return name;
     }
 
