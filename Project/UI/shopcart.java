@@ -1,4 +1,4 @@
-package project.ui;
+package view_gang;
 import java.awt.Graphics;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
@@ -7,7 +7,9 @@ import java.util.Arrays;
 
 import javax.swing.*;
 
-import project.bean.*;
+import barket.ArrayGenerator;
+import barket.Product;
+import barket.ProductIterator;
 
 import java.awt.TextField;
 import java.awt.Color;
@@ -21,11 +23,20 @@ public class shopcart extends JFrame{
 	private static final long serialVersionUID = 1L;
 	JScrollPane scrollPane;
     ImageIcon icon;
-
+    private JTextField textField;
+    private int[] scores = new int[5];
     
-
     String ImgName =  "C:/Users/dita810/Downloads/wLSAKR/NICE_PROJECT/IMG/";
+private int index; // 현재 인덱스 저장용
+private static final String[] IMAGES = { // 이미지 경로 문자열로 저장
+"C:/Users/dita810/Desktop/myJava/SWING/src/afasf.PNG",
+"C:/Users/dita810/Desktop/myJava/SWING/src/afasf.PNG",
+"C:/Users/dita810/Desktop/myJava/SWING/src/afasf.PNG",
+};
+public int add1=0;
+public int add2=0;
 
+public int add3=0;
 
 
     public shopcart() {
@@ -33,19 +44,19 @@ public class shopcart extends JFrame{
     	  
            /// 데이터입력 이름 ,주소 ,재고량 ,가격
            
-    	BarketProduct[] products = new BarketProduct[]{
-    		    new BarketProduct("나이키 이름이름", ImgName+"shoose1.PNG", 10, 10000),
-    		    new BarketProduct("나이키이르이름2", ImgName+"shoose2.PNG", 20, 20000)
+    	Product[] products = new Product[]{
+    		    new Product("나이키 이름이름", ImgName+"shoose1.PNG", 10, 10000),
+    		    new Product("나이키이르이름2", ImgName+"shoose2.PNG", 20, 20000)
     		};
 
-    		BarketProduct[] productArray = new BarketProduct[products.length];
+    		Product[] productArray = new Product[products.length];
     		String[] names = new String[products.length];
     		ImageIcon[] icons = new ImageIcon[products.length];
     		int[] quantity = new int[products.length];
     		int[] price = new int[products.length];
 
     		int i = 0;
-    		for (BarketProduct product : new BarketProductIterator(products)) {
+    		for (Product product : new ProductIterator(products)) {
     		    productArray[i++] = product;
     		}
 
@@ -71,7 +82,7 @@ public class shopcart extends JFrame{
         
     		String[][] arrays = new String[quantity.length][];
     		for (int j = 0; j < quantity.length; j++) {
-    		    BarketArrayGenerator intArray = new BarketArrayGenerator(quantity[j]);
+    		    ArrayGenerator intArray = new ArrayGenerator(quantity[j]);
     		    int[] array = intArray.getArray();
     		    arrays[j] = Arrays.toString(array).replaceAll("[\\[\\]]", "").split(", ");
     		}
@@ -82,7 +93,7 @@ public class shopcart extends JFrame{
     		}
     		
     		
-        icon = new ImageIcon(ImgName+"/back2.PNG");
+        icon = new ImageIcon(ImgName+"back2.PNG");
        
         //배경 Panel 생성후 컨텐츠페인으로 지정      
         JPanel background = new JPanel() {
@@ -143,7 +154,10 @@ public class shopcart extends JFrame{
         
 
      
-     
+
+        JLabel 가격 = new JLabel("0");
+        가격.setBounds(321, 531, 99, 33);
+        background.add(가격);
       
             
         JComboBox comboBox = new JComboBox(arrays[0]);
@@ -155,14 +169,37 @@ public class shopcart extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
             	 String selectedItem = (String)comboBox.getSelectedItem();
-                 System.out.print(selectedItem);
+
+                 
+                 add1=Integer.parseInt(selectedItem)*(price[0]);
+         		System.out.print(add1);
+         		add3=add1+add2;
+         	  	가격.setText(Integer.toString(add1));
             }
         });
 		//System.out.print(a);
       //  System.out.print(selectedItem);
-		
+   
+
         JComboBox comboBox_1 = new JComboBox(arrays[1]);
-    
+        comboBox_1.addActionListener(new ActionListener() {
+        	
+        	
+ 	        
+ 	        
+            @Override
+            public void actionPerformed(ActionEvent e) {
+           	 String selectedItem = (String)comboBox_1.getSelectedItem();
+
+                
+                add2=Integer.parseInt(selectedItem)*(price[0]);
+        		System.out.print(add2);
+        		add3=add1+add2;
+        	  	가격.setText(Integer.toString(add3));
+           }
+        });
+    	
+    	
         comboBox_1.setBounds(244, 456, 54, 23);
         background.add(comboBox_1);
         
@@ -213,7 +250,8 @@ public class shopcart extends JFrame{
         });
         immediatepurchase.setBounds(0, 574, 432, 58);
         background.add(immediatepurchase);
-
+        System.out.print(add1+add2);
+   
       
  
   
