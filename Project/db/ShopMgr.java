@@ -449,38 +449,36 @@ public class ShopMgr {
 		return cartHm;
 	}
 	
-	public boolean updateCartFromMem(int memIdx, int status) {
+	public boolean updateCartFromPro(CartBean cb, int status) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		String sql = null;
 		int updateAmount = 0;
 		try {
 			con = pool.getConnection();
-			sql = "update order_log set status = ? where MEM_IDX = ? AND STATUS = 0";
-			pstmt = con.prepareStatement(sql);
-			pstmt.setInt(1, status);
-			pstmt.setInt(2, memIdx);
-			updateAmount = pstmt.executeUpdate();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			pool.freeConnection(con, pstmt);
-		}
-		return updateAmount > 0 ? true:false;
-	}
-	
-	public boolean updateCartFromPro(int proIdx, int status) {
-		Connection con = null;
-		PreparedStatement pstmt = null;
-		String sql = null;
-		int updateAmount = 0;
-		try {
-			con = pool.getConnection();
-			sql = "update order_log set status = ? where PRO_IDX = ? AND STATUS = 0";
-			pstmt = con.prepareStatement(sql);
-			pstmt.setInt(1, status);
-			pstmt.setInt(2, proIdx);
-			updateAmount = pstmt.executeUpdate();
+			if (status == 1) {
+				con.setAutoCommit(false);
+				sql = "update order_log set status = ? where PRO_IDX = ? AND MEM_IDX = ? AND STATUS = 0";
+				pstmt = con.prepareStatement(sql);
+				pstmt.setInt(1, status);
+				pstmt.setInt(2, cb.getProIdx());
+				pstmt.setInt(3, cb.getMemIdx());
+				updateAmount = pstmt.executeUpdate();
+				sql = "update product set inventory = inventory - ? where PRO_IDX = ?";
+				pstmt = con.prepareStatement(sql);
+				pstmt.setInt(1, cb.getQuantity());
+				pstmt.setInt(2, cb.getProIdx());
+				updateAmount = pstmt.executeUpdate();
+				con.commit();
+				con.setAutoCommit(true);
+			} else {
+				sql = "update order_log set status = ? where PRO_IDX = ? AND STATUS = 0";
+				pstmt = con.prepareStatement(sql);
+				pstmt.setInt(1, status);
+				pstmt.setInt(2, cb.getProIdx());
+				updateAmount = pstmt.executeUpdate();
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

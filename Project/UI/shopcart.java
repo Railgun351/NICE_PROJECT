@@ -138,8 +138,12 @@ public class shopcart extends JFrame implements ChangeListener, ActionListener{
 		immediatepurchase.setIcon(new ImageIcon(ImgName + "주문하기.png"));
 		immediatepurchase.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				sm.updateCartFromMem(memIdx, 1);
-				addData();
+				int choice = JOptionPane.showConfirmDialog(null, "장바구니에 있는 모든 상품을 주문합니다.","안내",JOptionPane.YES_NO_OPTION);
+				if (choice == JOptionPane.YES_OPTION) {
+					confirmOrder();
+				} else {
+					JOptionPane.showMessageDialog(null, "결재를 취소했습니다.","안내",JOptionPane.INFORMATION_MESSAGE);
+				}
 			}
 		});
 		immediatepurchase.setBounds(0, 570, 405, 58);
@@ -228,13 +232,10 @@ public class shopcart extends JFrame implements ChangeListener, ActionListener{
 				dataPanel.add(p);
 			}
 		} else {
-			ImageIcon ic = new ImageIcon(ImgName+"NoProduct.png");
-			Image img = ic.getImage();
-			Image img2 = img.getScaledInstance(404, 404, Image.SCALE_SMOOTH);
-			ic = new ImageIcon(img2);
-//			dataPanel.paint(new Graphics);
+			
 		}
 		repaint();
+		validate();
 	}
 	
 	public String toWon(long Amount) {
@@ -259,6 +260,23 @@ public class shopcart extends JFrame implements ChangeListener, ActionListener{
 			}
 		}
 		return sb.toString();
+	}
+	
+	private void confirmOrder() {
+		if (cartBV.size() > 0) {
+			for (int i = 0; i < cartBV.size(); i++) {
+				if (!sm.updateCartFromPro(cartBV.get(i), 1)) {
+					JOptionPane.showMessageDialog(null, "결제 중 문제가 발생하였습니다.\n다시 한번 확인해주세요.","안내",JOptionPane.ERROR_MESSAGE);
+					break;
+				}
+				if (i == cartBV.size()-1) {
+					JOptionPane.showMessageDialog(null, "상품 주문 및 결제가 완료되었습니다.\n 결제 금액 : "+toWon(totalPrice),"안내",JOptionPane.INFORMATION_MESSAGE);
+					addData();
+				}
+			}
+		} else {
+			JOptionPane.showMessageDialog(null, "결제 할 상품이 없습니다.\n다시 한번 확인해주세요.","안내",JOptionPane.ERROR_MESSAGE);
+		}
 	}
 	
 	public static void main(String[] args) {
@@ -299,7 +317,7 @@ public class shopcart extends JFrame implements ChangeListener, ActionListener{
 				break;
 			}
 		}
-		if (sm.updateCartFromPro(cb.getProIdx(), 2)) {
+		if (sm.updateCartFromPro(cb, 2)) {
 			JOptionPane.showMessageDialog(null, "장바구니에서 해당 상품이 삭제되었습니다.","안내",JOptionPane.INFORMATION_MESSAGE);
 			cartBV.remove(idx);
 			addData();
