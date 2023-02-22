@@ -1,29 +1,31 @@
 package project.bean;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 public class StarCustomer implements StarObserver {
-	private int  columnum;
-    private int name;
+
+    private int Membername;
     private int targetScore;
     private String review;
-    private Date date;
-    public StarCustomer(int columnum ,int Membername, int targetScore,String review,Date date) {
-        this.name = name;
+    private Timestamp date;
+    public StarCustomer(int Membername, int targetScore,String review,Timestamp date) {
+        this.Membername = Membername;
         this.targetScore = targetScore;
         this.review = review;
         this.date = date;
     }
-    public void update(int score) {
+
+
+
+	public void update(int score) {
         if (score == targetScore) {
-            System.out.println(name + ": " + score +"  "+ "리뷰"+review);
+            System.out.println(Membername + ": " + score +"  "+ "리뷰"+review);
         }
     }
-    public int getcolumnum() {
-        return columnum;
-    }
-    public int getName() {
-        return name;
+  
+    public int getMembername() {
+        return Membername;
     }
 
     public int getTargetScore() {
@@ -34,7 +36,15 @@ public class StarCustomer implements StarObserver {
         return review;
     }
 
-    public Date getDate() {
+    public Timestamp getDate() {
         return date;
     }
-}
+
+
+
+
+	}
+
+
+
+
