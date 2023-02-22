@@ -18,10 +18,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import db.*;
+import project.gangdb.*;
 import project.bean.*;
 
-public class DetailedPage extends JFrame {
+public class d extends JFrame {
     /**
 	 * 
 	 */
@@ -40,7 +40,7 @@ public class DetailedPage extends JFrame {
 
     String ImgName =  "C:/Users/dita810/Downloads/wLSAKR/NICE_PROJECT/IMG/";
 
-    public DetailedPage() throws Exception {
+    public d() throws Exception {
     	
     
  //백엔드 메인로직
@@ -80,8 +80,8 @@ public class DetailedPage extends JFrame {
 	        Object[] arr = new Object[StarDtoList.size()];
 	        int i = 0;
 	        
-	        for (StarDto StarDto : StarDtoList) {
-	        customers.add(new StarCustomer( StarDto.getMEM_IDX(),StarDto.getSTAR_RATING(), StarDto.getCOMMENTS(), StarDto.getCOM_DATE()));
+	        for (StarDto starDto : StarDtoList) {
+	        customers.add(new StarCustomer( starDto.getMEM_IDX(),starDto.getSTAR_RATING(), starDto.getCOMMENTS(), starDto.getCOM_DATE()));
 	        }
 	        System.out.println(); // 개행
 	        System.out.println(); // 개행
@@ -1088,7 +1088,7 @@ public class DetailedPage extends JFrame {
     }
  
     public static void main(String[] args) throws Exception {
-        DetailedPage frame = new DetailedPage();
+        d frame = new d();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(420,665);
         frame.setVisible(true);

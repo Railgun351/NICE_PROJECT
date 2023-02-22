@@ -1,4 +1,4 @@
-package db;
+package project.gangdb;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;

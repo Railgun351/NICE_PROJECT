@@ -1,4 +1,4 @@
-package db;
+package project.gangdb;
 
 public class StarDto {
     private Integer PRO_IDX;
