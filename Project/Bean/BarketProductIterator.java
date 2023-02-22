@@ -1,4 +1,4 @@
-package project.bean;
+package Project.Bean;
 
 import java.util.Iterator;
 

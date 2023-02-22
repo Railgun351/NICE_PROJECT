@@ -1,4 +1,4 @@
-package project.bean;
+package Project.Bean;
 public class BarketArrayGenerator {
     private int[] array;
 
