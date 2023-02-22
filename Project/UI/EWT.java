@@ -3,8 +3,11 @@ package project.ui;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,12 +18,17 @@ import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.border.Border;
 
 import project.bean.*;
 import project.bean.FactoryItemFactory;
@@ -43,15 +51,21 @@ public class EWT extends JFrame {
 	private JTextField textField;
 	private int[] scores = new int[5];
 	ArrayList<StarCustomer> customers = new ArrayList<>();
-	String ImgName = "C:/Users/dita810/Downloads/wLSAKR/NICE_PROJECT/IMG/";
+	String ImgName = "./IMG\\";
 	int score = 4;
+	private JFrame f;
 	// 전화면에서 크릭해서 들어온이미지
 
 	public EWT() {
 
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setSize(420, 665);
+		setTitle("제품 상세 페이지");
+		this.f = this;
+
 		// 백엔드 메인로직
 		List<FactoryItemFromMenu> items = new ArrayList<>();
-		items.add(FactoryItemFactory.createItem(1, "신발이름", 10000, ImgName + "bigshoose1.PNG"));
+		items.add(FactoryItemFactory.createItem(1, "신발이름", 10000, ImgName + "product1.PNG"));
 		items.add(FactoryItemFactory.createItem(1, "", 0, "photo2"));
 		items.add(FactoryItemFactory.createItem(1, "", 0, "photo3"));
 		FactoryItemFromMenu firstItem = items.get(0);
@@ -144,7 +158,7 @@ public class EWT extends JFrame {
 			private static final long serialVersionUID = 1L;
 
 			public void paintComponent(Graphics g) {
-
+				
 				g.drawImage(icon.getImage(), 0, 0, null);
 
 				setOpaque(false);
@@ -278,7 +292,8 @@ public class EWT extends JFrame {
 		createReview.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// 로직추가
-				customers.add(new StarCustomer("김철수", 1, "별루에요", new Date()));
+//				customers.add(new StarCustomer("김철수", 1, "별루에요", new Date()));
+				AddReveiw ar = AddReveiw.getInstance(f);
 			}
 		});
 		createReview.setIcon(new ImageIcon(ImgName + "리뷰작성.PNG"));
@@ -287,8 +302,12 @@ public class EWT extends JFrame {
 		background.add(createReview);
 
 		JLabel images = new JLabel("");
-		images.setBounds(0, 139, 401, 229);
-		images.setIcon(new ImageIcon(photo));
+		images.setBounds(85, 120, 250, 250);
+		ImageIcon ic = new ImageIcon(photo);
+		Image img = ic.getImage();
+		Image img2 = img.getScaledInstance(250, 250, Image.SCALE_SMOOTH);
+		ic = new ImageIcon(img2);
+		images.setIcon(ic);
 		background.add(images);
 
 		JButton gotobarket = new JButton("");
@@ -545,12 +564,65 @@ public class EWT extends JFrame {
 		background.add(star5);
 
 		setContentPane(scrollPane);
+		setVisible(true);
+	}
+
+	static class AddReveiw extends JDialog {
+
+		private static AddReveiw instance;
+		
+		public static AddReveiw getInstance(JFrame f) {
+			if (instance == null) {
+				synchronized (AddReveiw.class) {
+					instance = new AddReveiw(f);
+				}
+			}
+			return instance;
+		}
+		
+		private AddReveiw(JFrame f) {
+			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			setTitle("리뷰 작성");
+			setSize(300, 100);
+			setLocationRelativeTo(f);
+			setModal(true);
+			setLayout(new BorderLayout());
+			JPanel p1 = new JPanel(new BorderLayout());
+			JLabel commentTitle = new JLabel("리뷰 작성(0/100)");
+			commentTitle.setHorizontalAlignment(JLabel.CENTER);
+			p1.add(commentTitle,BorderLayout.NORTH);
+			JTextArea ta = new JTextArea();
+			ta.setLineWrap(true);
+			ta.addKeyListener(new KeyAdapter() {
+				@Override
+				public void keyReleased(KeyEvent e) {
+					int txtCnt = ta.getText().length();
+					commentTitle.setText("리뷰 작성("+txtCnt+"/100)");
+					if (txtCnt > 100) {
+						commentTitle.setForeground(Color.RED);
+					} else {
+						commentTitle.setForeground(Color.BLACK);
+					}
+				}
+			});
+			JScrollPane sp = new JScrollPane(ta);
+			p1.add(sp, BorderLayout.CENTER);
+			add(p1,BorderLayout.CENTER);
+			JPanel p2 = new JPanel(new BorderLayout());
+			SpinnerNumberModel model = new SpinnerNumberModel(1,1,5,1);
+			JSpinner sn = new JSpinner(model);
+			p2.add(sn, BorderLayout.CENTER);
+			JLabel starRating = new JLabel("별점");
+			p2.add(starRating,BorderLayout.NORTH);
+			add(p2,BorderLayout.EAST);
+			JButton confirmBtn = new JButton("작성");
+			p2.add(confirmBtn, BorderLayout.SOUTH);
+
+			setVisible(true);
+		}
 	}
 
 	public static void main(String[] args) {
 		EWT frame = new EWT();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(420, 665);
-		frame.setVisible(true);
 	}
 }

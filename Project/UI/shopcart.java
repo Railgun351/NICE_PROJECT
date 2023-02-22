@@ -1,269 +1,310 @@
-package view_gang;
+package project.ui;
+
 import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Label;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.ImageObserver;
+import java.math.BigInteger;
+import java.text.AttributedCharacterIterator;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Vector;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
-import barket.ArrayGenerator;
-import barket.Product;
-import barket.ProductIterator;
+import project.bean.*;
+import project.db.ShopMgr;
 
 import java.awt.TextField;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.SystemColor;
 import java.awt.Font;
- 
-public class shopcart extends JFrame{
-    /**
+import java.awt.FontMetrics;
+
+public class shopcart extends JFrame implements ChangeListener, ActionListener{
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	JScrollPane scrollPane;
-    ImageIcon icon;
-    private JTextField textField;
-    private int[] scores = new int[5];
-    
-    String ImgName =  "C:/Users/dita810/Downloads/wLSAKR/NICE_PROJECT/IMG/";
-private int index; // 현재 인덱스 저장용
-private static final String[] IMAGES = { // 이미지 경로 문자열로 저장
-"C:/Users/dita810/Desktop/myJava/SWING/src/afasf.PNG",
-"C:/Users/dita810/Desktop/myJava/SWING/src/afasf.PNG",
-"C:/Users/dita810/Desktop/myJava/SWING/src/afasf.PNG",
-};
-public int add1=0;
-public int add2=0;
+//	JScrollPane scrollPane;
+	ImageIcon icon;
+	JPanel dataPanel;
+	ShopMgr sm;
+	String ImgName = "./IMG\\";
+	private String memName;
+	private int memIdx;
+	private Vector<CartBean> cartBV = new Vector<>();
+	private JLabel totalPriceLb;
+	private long totalPrice;
+	public shopcart(String memName, int memIdx) {
 
-public int add3=0;
+		//DB연결
+		sm = ShopMgr.getInstance();
+		
+		this.memIdx = memIdx;
+		this.memName = memName;
 
+		icon = new ImageIcon(ImgName + "back2.PNG");
 
-    public shopcart() {
-    	
-    	  
-           /// 데이터입력 이름 ,주소 ,재고량 ,가격
-           
-    	Product[] products = new Product[]{
-    		    new Product("나이키 이름이름", ImgName+"shoose1.PNG", 10, 10000),
-    		    new Product("나이키이르이름2", ImgName+"shoose2.PNG", 20, 20000)
-    		};
-
-    		Product[] productArray = new Product[products.length];
-    		String[] names = new String[products.length];
-    		ImageIcon[] icons = new ImageIcon[products.length];
-    		int[] quantity = new int[products.length];
-    		int[] price = new int[products.length];
-
-    		int i = 0;
-    		for (Product product : new ProductIterator(products)) {
-    		    productArray[i++] = product;
-    		}
-
-    		// 배열에 정보 저장
-    		for (int j = 0; j < productArray.length; j++) {
-    		    icons[j] = new ImageIcon(productArray[j].getImage());
-    		    names[j] = productArray[j].getName();
-    		    quantity[j] = productArray[j].getQuantity();
-    		    price[j] = productArray[j].getPrice();
-    		}
-
-    		// 배열 출력
-    		for (int j = 0; j < productArray.length; j++) {
-    		    System.out.println("Name: " + names[j]);
-    		    System.out.println("Image: " + icons[j]);
-    		    System.out.println("Quantity: " + quantity[j]);
-    		    System.out.println("Price: " + price[j]);
-    		   
-    		    System.out.println();
-    		}
-
-    	
-        
-    		String[][] arrays = new String[quantity.length][];
-    		for (int j = 0; j < quantity.length; j++) {
-    		    ArrayGenerator intArray = new ArrayGenerator(quantity[j]);
-    		    int[] array = intArray.getArray();
-    		    arrays[j] = Arrays.toString(array).replaceAll("[\\[\\]]", "").split(", ");
-    		}
-
-    		// 배열 출력
-    		for (int j = 0; j < arrays.length; j++) {
-    		    System.out.println("Array " + j + ": " + Arrays.toString(arrays[j]));
-    		}
-    		
-    		
-        icon = new ImageIcon(ImgName+"back2.PNG");
-       
-        //배경 Panel 생성후 컨텐츠페인으로 지정      
-        JPanel background = new JPanel() {
-            /**
+		// 배경 Panel 생성후 컨텐츠페인으로 지정
+		JPanel background = new JPanel() {
+			/**
 			 * 
 			 */
 			private static final long serialVersionUID = 1L;
 
 			public void paintComponent(Graphics g) {
-               
-                g.drawImage(icon.getImage(), 0, 0, null);
-              
-                setOpaque(false); 
-                super.paintComponent(g);
-            }
-        };
-        background.setBackground(SystemColor.menu);
-        background.setForeground(Color.LIGHT_GRAY);
-        background.setLayout(null);
-        scrollPane = new JScrollPane(background);
-        
-        JButton gotobarket = new JButton("");
-        gotobarket.setIcon(new ImageIcon(ImgName+"CART.PNG"));
-        gotobarket.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        	}
-        });
-     
-        gotobarket.setBounds(370, 10, 31, 39);
-        background.add(gotobarket);
-        
-        JButton logout = new JButton("");
-        logout.setIcon(new ImageIcon(ImgName+"LOGOUT.PNG"));
-        logout.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        	}
-        });
-        logout.setBounds(327, 10, 31, 39);
-        background.add(logout);
-        
-        JButton back = new JButton("");
-        back.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        	}
-        });
-        back.setIcon(new ImageIcon(ImgName+"BACK.PNG"));
-        back.setBounds(12, 10, 18, 39);
-        background.add(back);
-        
-        JTextPane 회원이름 = new JTextPane();
-        회원이름.setFont(new Font("굴림", Font.PLAIN, 18));
-        회원이름.setBackground(SystemColor.menu);
-        회원이름.setForeground(Color.BLACK);
-        회원이름.setText("홍길동");
-        회원이름.setBounds(136, 84, 61, 33);
-        background.add(회원이름);
-        
-        
 
-     
+				g.drawImage(icon.getImage(), 0, 0, null);
 
-        JLabel 가격 = new JLabel("0");
-        가격.setBounds(321, 531, 99, 33);
-        background.add(가격);
-      
-            
-        JComboBox comboBox = new JComboBox(arrays[0]);
-       
-        comboBox.setBounds(244, 271, 54, 23);
-        background.add(comboBox);
-       
-        comboBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            	 String selectedItem = (String)comboBox.getSelectedItem();
+				setOpaque(false);
+				super.paintComponent(g);
+			}
+		};
+		background.setBackground(SystemColor.menu);
+		background.setForeground(Color.LIGHT_GRAY);
+		background.setLayout(null);
+//		scrollPane = new JScrollPane(background);
+		totalPriceLb = new JLabel("0");
+		totalPriceLb.setBounds(0, 530, 400, 30);
+		totalPriceLb.setBackground(Color.WHITE);
+		totalPriceLb.setOpaque(true);
+		totalPriceLb.setFont(new Font("돋움체", Font.BOLD, 20));
+		totalPriceLb.setHorizontalAlignment(JLabel.RIGHT);
+		background.add(totalPriceLb);
 
-                 
-                 add1=Integer.parseInt(selectedItem)*(price[0]);
-         		System.out.print(add1);
-         		add3=add1+add2;
-         	  	가격.setText(Integer.toString(add1));
-            }
-        });
-		//System.out.print(a);
-      //  System.out.print(selectedItem);
-   
+		JButton logout = new JButton("");
+		logout.setIcon(new ImageIcon(ImgName + "LOGOUT.PNG"));
+		logout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		logout.setBounds(360, 10, 31, 39);
+		logout.setOpaque(true);
+		background.add(logout);
 
-        JComboBox comboBox_1 = new JComboBox(arrays[1]);
-        comboBox_1.addActionListener(new ActionListener() {
-        	
-        	
- 	        
- 	        
-            @Override
-            public void actionPerformed(ActionEvent e) {
-           	 String selectedItem = (String)comboBox_1.getSelectedItem();
+		JButton back = new JButton("");
+		back.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		back.setIcon(new ImageIcon(ImgName + "BACK.PNG"));
+		back.setBounds(12, 10, 18, 39);
+		background.add(back);
 
-                
-                add2=Integer.parseInt(selectedItem)*(price[0]);
-        		System.out.print(add2);
-        		add3=add1+add2;
-        	  	가격.setText(Integer.toString(add3));
-           }
-        });
-    	
-    	
-        comboBox_1.setBounds(244, 456, 54, 23);
-        background.add(comboBox_1);
-        
-        JLabel 이미지1 = new JLabel("");
-        이미지1.setIcon(icons[0]);
-        이미지1.setBounds(24, 154, 150, 151);
-        background.add(이미지1);
-        
-        JLabel 이미지2 = new JLabel("");
-        이미지2.setIcon(icons[1]);
-        이미지2.setBounds(12, 332, 172, 166);
-        background.add(이미지2);
-        
-        JLabel 남성신발 = new JLabel("남성신발");
-        남성신발.setBounds(196, 186, 74, 21);
-        background.add(남성신발);
-        
-        JLabel 남성신발_1 = new JLabel("남성신발");
-        남성신발_1.setBounds(196, 375, 74, 21);
-        background.add(남성신발_1);
-        
-        JLabel 신발이름2 = new JLabel( names[1]);
-        신발이름2.setBounds(196, 345, 150, 33);
-        background.add(신발이름2);
-        
-        JLabel 신발이름1 = new JLabel(names[0]);
-        신발이름1.setBounds(194, 154, 150, 33);
-        background.add(신발이름1);
-        
-        JLabel 장바구니 = new JLabel("의장바구니");
-        장바구니.setFont(new Font("굴림", Font.PLAIN, 18));
-        장바구니.setBounds(199, 84, 120, 33);
-        background.add(장바구니);
-        
-        JLabel 각격1 = new JLabel(Integer.toString(price[0]));
-        각격1.setBounds(241, 234, 150, 33);
-        background.add(각격1);
-        
-        JLabel lblNewLabel = new JLabel(Integer.toString(price[1]));
-        lblNewLabel.setBounds(244, 419, 150, 27);
-        background.add(lblNewLabel);
-        
-        JButton immediatepurchase = new JButton("");
-        immediatepurchase.setIcon(new ImageIcon(ImgName+"주문하기.png"));
-        immediatepurchase.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        	}
-        });
-        immediatepurchase.setBounds(0, 574, 432, 58);
-        background.add(immediatepurchase);
-        System.out.print(add1+add2);
-   
-      
- 
-  
-        setContentPane(scrollPane);
-    }
- 
+//		JComboBox comboBox = new JComboBox(arrays[0]);
+//
+//		comboBox.setBounds(244, 271, 54, 23);
+//		background.add(comboBox);
+//
+//		comboBox.addActionListener(new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				String selectedItem = (String) comboBox.getSelectedItem();
+//
+//				add1 = Integer.parseInt(selectedItem) * (price[0]);
+//				System.out.print(add1);
+//				add3 = add1 + add2;
+//				가격.setText(Integer.toString(add3));
+//			}
+//		});
+		
+		dataPanel = new JPanel(new GridLayout(0,1,10,10));
+		dataPanel.setBackground(Color.BLACK);
+		
+		JScrollPane sp = new JScrollPane(dataPanel);
+		sp.setBounds(0, 120, 404, 404);
+		background.add(sp);
+		
+		JLabel subTitle = new JLabel(memName+"님의 장바구니");
+		subTitle.setFont(new Font("돋움체", Font.PLAIN, 18));
+		subTitle.setHorizontalAlignment(JLabel.CENTER);
+		subTitle.setBounds(0, 84, 405, 33);
+		background.add(subTitle);
 
-    
-    public static void main(String[] args) {
-        shopcart frame = new shopcart();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(420,665);
-        frame.setVisible(true);
-    }
+		addData();
+		
+		JButton immediatepurchase = new JButton("");
+		immediatepurchase.setIcon(new ImageIcon(ImgName + "주문하기.png"));
+		immediatepurchase.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				sm.updateCartFromMem(memIdx, 1);
+				addData();
+			}
+		});
+		immediatepurchase.setBounds(0, 570, 405, 58);
+		background.add(immediatepurchase);
+
+//		setContentPane(scrollPane);
+		setContentPane(background);
+		validate();
+	}
+
+	public JPanel createData(String proName, int proPrice, int proIdx, int quantity) {
+		JPanel panel = new JPanel();
+//		panel.setBounds(10,y+10,420, 50);
+//		panel.setSize(420, 50);
+//		panel.setPreferredSize(new Dimension(420, 50));
+		panel.setLayout(null);
+		
+		CartBean cb = new CartBean();
+		
+		JLabel imgLb = new JLabel("NO IMG");
+		ImageIcon ic = new ImageIcon(ImgName+"product"+proIdx+".png");
+		Image img = ic.getImage();
+		Image img2 = img.getScaledInstance(180, 180, Image.SCALE_SMOOTH);
+		ic = new ImageIcon(img2);
+		imgLb.setIcon(ic);
+		imgLb.setBounds(10, 10, 180, 180);
+		panel.add(imgLb);
+		
+		JLabel nameLb = new JLabel(proName);
+		nameLb.setBounds(200, 30, 160, 60);
+		panel.add(nameLb);
+		
+		JLabel priceLb = new JLabel(toWon(proPrice));
+		priceLb.setBounds(200, 90, 160, 60);
+		panel.add(priceLb);
+		
+		JLabel quanLb = new JLabel("수량");
+		quanLb.setBounds(200, 150, 40, 40);
+		panel.add(quanLb);
+		
+		SpinnerNumberModel model = new SpinnerNumberModel(1,1,999999999,1);
+		JSpinner quanSp = new JSpinner(model);
+		quanSp.setBounds(230, 150, 90, 40);
+		quanSp.setFont(new Font("돋움체", Font.BOLD, 20));
+		quanSp.setValue(quantity);
+		quanSp.addChangeListener(this);
+		panel.add(quanSp);
+		
+		JButton btn = new JButton();
+		ic = new ImageIcon(ImgName + "x.PNG");
+		img = ic.getImage();
+		img2 = img.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+		ic = new ImageIcon(img2);
+		btn.setIcon(ic);
+		btn.setBounds(355, 0, 30, 30);
+		btn.setContentAreaFilled(false);
+		btn.addActionListener(this);
+		panel.add(btn);
+		
+		cb.setMemIdx(memIdx);
+		cb.setProIdx(proIdx);
+		cb.setProName(proName);
+		cb.setProPrice(proPrice);
+		cb.setQuantity(quantity);
+		cb.setJsp(quanSp);
+		cb.setBtn(btn);
+		cartBV.add(cb);
+		totalPrice += cb.getProPrice()*cb.getQuantity();
+		totalPriceLb.setText("합계 : "+toWon(totalPrice));
+		
+		return panel;
+	}
+	
+	public void addData() {
+		dataPanel.removeAll();
+		totalPrice = 0;
+		HashMap<Integer, CartBean> cartMap = sm.selectCart(memIdx);
+		if (cartMap.size() > 0) {
+			for (int key:cartMap.keySet()) {
+				String proName = cartMap.get(key).getProName();
+				int proPrice = cartMap.get(key).getProPrice();
+				int proIdx = cartMap.get(key).getProIdx();
+				int quantity = cartMap.get(key).getQuantity();
+				JPanel p = createData(proName, proPrice, proIdx, quantity);
+				p.setPreferredSize(new Dimension(370, 200));
+				dataPanel.add(p);
+			}
+		} else {
+			ImageIcon ic = new ImageIcon(ImgName+"NoProduct.png");
+			Image img = ic.getImage();
+			Image img2 = img.getScaledInstance(404, 404, Image.SCALE_SMOOTH);
+			ic = new ImageIcon(img2);
+//			dataPanel.paint(new Graphics);
+		}
+		repaint();
+	}
+	
+	public String toWon(long Amount) {
+		StringBuilder sb = new StringBuilder();
+		while (true) {
+			if (Amount > (long)Math.pow(10, 12)) {
+				sb.append((long)Math.floor(Amount/(long)Math.pow(10, 12))+"조");
+				Amount %= (long)Math.pow(10, 12);
+			} else if (Amount > (long)Math.pow(10, 8)) {
+				sb.append((long)Math.floor(Amount/(long)Math.pow(10, 8))+"억");
+				Amount %= (long)Math.pow(10, 8);
+			} else if (Amount > (long)Math.pow(10, 4)) {
+				sb.append((long)Math.floor(Amount/(long)Math.pow(10, 4))+"만");
+				Amount %= (long)Math.pow(10, 4);
+			} else {
+				if (Amount == 0) {
+					sb.append("원");
+				} else {
+					sb.append(Amount+"원");
+				}
+				break;
+			}
+		}
+		return sb.toString();
+	}
+	
+	public static void main(String[] args) {
+		shopcart frame = new shopcart("서수정",1);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(420, 665);
+		frame.setVisible(true);
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		JSpinner jsp = (JSpinner) e.getSource();
+		CartBean cb = null;
+		int idx = -1;
+		for (int i = 0; i < cartBV.size(); i++) {
+			if (cartBV.get(i).getJsp() == jsp) {
+				cb = cartBV.get(i);
+				idx = i;
+				break;
+			}
+		}
+		long subtract = (int)jsp.getValue() - cb.getQuantity();
+		cartBV.get(idx).setQuantity((int)jsp.getValue());
+		totalPrice += cb.getProPrice()*subtract;
+		totalPriceLb.setText("합계 : "+toWon(totalPrice));
+		repaint();
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		JButton btn = (JButton)e.getSource();
+		CartBean cb = null;
+		int idx = -1;
+		for (int i = 0; i < cartBV.size(); i++) {
+			if (btn == cartBV.get(i).getBtn()) {
+				cb = cartBV.get(i);
+				idx = i;
+				break;
+			}
+		}
+		if (sm.updateCartFromPro(cb.getProIdx(), 2)) {
+			JOptionPane.showMessageDialog(null, "장바구니에서 해당 상품이 삭제되었습니다.","안내",JOptionPane.INFORMATION_MESSAGE);
+			cartBV.remove(idx);
+			addData();
+		} else {
+			JOptionPane.showMessageDialog(null, "상품삭제 중 문제가 발생하였습니다.\n다시 한번 확인해주세요.","안내",JOptionPane.ERROR_MESSAGE);
+		}
+	}
 }

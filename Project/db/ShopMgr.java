@@ -4,10 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.util.HashMap;
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.table.DefaultTableModel;
 
+import oracle.sql.TIMESTAMP;
+import project.bean.CartBean;
 import project.bean.ProductBean;
 import project.bean.StatisBean;
 
@@ -407,6 +410,83 @@ public class ShopMgr {
 			pool.freeConnection(con, pstmt);
 		}
 		return returnStr;
+	}
+	
+	public HashMap<Integer, CartBean> selectCart(int memIdx) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		HashMap<Integer, CartBean> cartHm = new HashMap<>();
+		double sum = 0;
+		try {
+			con = pool.getConnection();
+			sql = "select p.pro_idx as proIdx, p.name as name, o.quantity as quantity, p.price as price\r\n"
+					+ "from order_log o, product p\r\n"
+					+ "where p.pro_idx = o.pro_idx and o.mem_idx = ? and status = 0";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, memIdx);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				CartBean cb = new CartBean();
+				cb.setProIdx(rs.getInt(1));
+				cb.setProName(rs.getString(2));
+				cb.setQuantity(rs.getInt(3));
+				cb.setProPrice(rs.getInt(4));
+				cb.setMemIdx(memIdx);
+				if (!cartHm.containsKey(cb.getProIdx())) {
+					cartHm.put(cb.getProIdx(), cb);
+				} else {
+					int temp = cartHm.get(cb.getProIdx()).getQuantity();
+					temp += cb.getQuantity();
+					cartHm.get(cb.getProIdx()).setQuantity(temp);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+		return cartHm;
+	}
+	
+	public boolean updateCartFromMem(int memIdx, int status) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		int updateAmount = 0;
+		try {
+			con = pool.getConnection();
+			sql = "update order_log set status = ? where MEM_IDX = ? AND STATUS = 0";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, status);
+			pstmt.setInt(2, memIdx);
+			updateAmount = pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+		return updateAmount > 0 ? true:false;
+	}
+	
+	public boolean updateCartFromPro(int proIdx, int status) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		int updateAmount = 0;
+		try {
+			con = pool.getConnection();
+			sql = "update order_log set status = ? where PRO_IDX = ? AND STATUS = 0";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, status);
+			pstmt.setInt(2, proIdx);
+			updateAmount = pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+		return updateAmount > 0 ? true:false;
 	}
 	
 //	public void insertMsg(ProductBean bean) {

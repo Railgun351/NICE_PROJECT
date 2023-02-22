@@ -101,6 +101,19 @@ public class Admin_Statistics extends JFrame {
 		scrollPane.setBounds(12, 363, 476, 357);
 		layeredPane.add(scrollPane);
 
+		JRadioButton rdbtnNewRadioButton = new JRadioButton("수량");
+		rdbtnNewRadioButton.setFont(new Font("돋움체", Font.PLAIN, 26));
+		rdbtnNewRadioButton.setSelected(true);
+		buttonGroup.add(rdbtnNewRadioButton);
+		rdbtnNewRadioButton.setBounds(37, 240, 80, 40);
+		layeredPane.add(rdbtnNewRadioButton);
+		
+		JRadioButton rdbtnNewRadioButton_1 = new JRadioButton("금액");
+		rdbtnNewRadioButton_1.setFont(new Font("돋움체", Font.PLAIN, 26));
+		buttonGroup.add(rdbtnNewRadioButton_1);
+		rdbtnNewRadioButton_1.setBounds(130, 240, 80, 40);
+		layeredPane.add(rdbtnNewRadioButton_1);
+		
 		JComboBox comboBox_Sub = new JComboBox();
 		comboBox_Sub.setBounds(222, 310, 102, 23);
 		comboBox_Sub.setEnabled(false);
@@ -127,20 +140,22 @@ public class Admin_Statistics extends JFrame {
 				}
 			}
 		});
+		comboBox_Main.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int type = 0;
+				if (rdbtnNewRadioButton.isSelected()) {
+					type = 0;
+				} else {
+					type = 1;
+				}
+				System.out.println(type);
+				addData(comboBox_Main.getSelectedIndex(), (String)comboBox_Sub.getSelectedItem(), type);
+				validate();
+			}
+		});
 		layeredPane.add(comboBox_Main);
-
-		JRadioButton rdbtnNewRadioButton = new JRadioButton("수량");
-		rdbtnNewRadioButton.setFont(new Font("돋움체", Font.PLAIN, 26));
-		rdbtnNewRadioButton.setSelected(true);
-		buttonGroup.add(rdbtnNewRadioButton);
-		rdbtnNewRadioButton.setBounds(37, 240, 80, 40);
-		layeredPane.add(rdbtnNewRadioButton);
-		
-		JRadioButton rdbtnNewRadioButton_1 = new JRadioButton("금액");
-		rdbtnNewRadioButton_1.setFont(new Font("돋움체", Font.PLAIN, 26));
-		buttonGroup.add(rdbtnNewRadioButton_1);
-		rdbtnNewRadioButton_1.setBounds(130, 240, 80, 40);
-		layeredPane.add(rdbtnNewRadioButton_1);
 		
 		JButton btn_Search = new JButton("");
 		btn_Search.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
