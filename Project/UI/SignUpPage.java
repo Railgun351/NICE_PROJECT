@@ -1,4 +1,4 @@
-package Project.UI;
+package project.ui;
 
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -23,7 +23,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.UIManager;
 import java.awt.SystemColor;
-import Project.db.ShopMgr;
+import project.db.ShopMgr;
 
 public class SignUpPage extends JFrame {
 
@@ -61,7 +61,7 @@ public class SignUpPage extends JFrame {
 
 		ImageIcon reImg = new ImageIcon(image);
 
-		// JLabel�� ������ �̹����� ����
+
 		JLabel label = new JLabel(reImg);
 		label.setBounds(0, 0, 524, 761);
 		getContentPane().add(label);
