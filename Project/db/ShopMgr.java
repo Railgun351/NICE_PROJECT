@@ -508,6 +508,84 @@ public class ShopMgr {
 //		return null;
 //		
 //	}
+	
+		public List<starDto> getStarDtoLists(int proIdx) throws SQLException {
+		    Connection con = null;
+		    PreparedStatement pstmt = null;
+		    String sql = "SELECT * FROM shop.REVIEW WHERE PRO_IDX = ?";
+		    List<starDto> starDtoList = new ArrayList<>();
+
+		    try {
+		        con = pool.getConnection();
+		        pstmt = con.prepareStatement(sql);
+		        pstmt.setInt(1, proIdx);
+		        ResultSet rs = pstmt.executeQuery();
+
+		        while (rs.next()) {
+		            starDto tempStarDto = new starDto(
+		                rs.getInt("PRO_IDX"),
+		                rs.getInt("MEM_IDX"),
+		                rs.getTimestamp("COM_DATE"),
+		                rs.getString("COMMENTS"),
+		                rs.getInt("STAR_RATING")
+		            );
+		            starDtoList.add(tempStarDto);
+		        }
+
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    } finally {
+		        pool.freeConnection(con, pstmt);
+		    }
+
+		    return starDtoList;
+		}
+		public boolean deleteStarCustomer(int proIdx, int memIdx, Timestamp comDate, String comments, int starRating){
+		    Connection con = null;
+		    PreparedStatement pstmt = null;
+		    String sql = null;
+		    int updateAmount = 0;
+		    try {
+		        con = pool.getConnection();
+		        sql = "DELETE FROM shop.REVIEW WHERE PRO_IDX = ? AND MEM_IDX = ? AND COM_DATE = ? AND COMMENTS = ? AND STAR_RATING = ?";
+		        pstmt = con.prepareStatement(sql);
+		        pstmt.setInt(1, proIdx);
+		        pstmt.setInt(2, memIdx);
+		        pstmt.setTimestamp(3, comDate);
+		        pstmt.setString(4, comments);
+		        pstmt.setInt(5, starRating);
+		        updateAmount = pstmt.executeUpdate();
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    } finally {
+		        pool.freeConnection(con, pstmt);
+		    }
+		    return updateAmount > 0 ? true : false;
+		}
+		public boolean updateStarCustomer(int proIdx, int memIdx, String comments, int starRating) {
+		    Connection con = null;
+		    PreparedStatement pstmt = null;
+		    String sql = null;
+		    int updateAmount = 0;
+		    try {
+		        con = pool.getConnection();
+		        sql = "UPDATE shop.REVIEW SET COMMENTS = ?, STAR_RATING = ?, COM_DATE = ? WHERE PRO_IDX = ? AND MEM_IDX = ?";
+		        pstmt = con.prepareStatement(sql);
+		        pstmt.setString(1, comments);
+		        pstmt.setInt(2, starRating);
+		        pstmt.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+		        pstmt.setInt(4, proIdx);
+		        pstmt.setInt(5, memIdx);
+		        updateAmount = pstmt.executeUpdate();
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    } finally {
+		        pool.freeConnection(con, pstmt);
+		    }
+		    return updateAmount > 0 ? true : false;
+		}
+		
+		//강성웅-리뷰
 
 }
 
