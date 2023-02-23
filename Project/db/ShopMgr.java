@@ -1,19 +1,23 @@
 package project.db;
-
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.table.DefaultTableModel;
 
-import project.Mainpage;
-import project.bean.*;
+import project.bean.ProductBean;
+import project.bean.StatisBean;
+import project.bean.starDto;
+
 public class ShopMgr {
 	private DBConnectionMgr pool;
 	private static ShopMgr shopMgr = null;
@@ -90,6 +94,8 @@ public class ShopMgr {
 		}
 	}
 	
+	
+
 	public boolean updateInven(int idx, int inven) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
@@ -467,49 +473,9 @@ public class ShopMgr {
 //		}
 //		return vlist;
 //	}
-	public boolean updateMember(String id, String pw, String name) throws Exception {
-	    Connection con = null;
-	    PreparedStatement pstmt = null;
-	    String sql = null;
-	    int updateAmount = 0;
-	    try {
-	        con = pool.getConnection();
-	        sql = "INSERT INTO users (id, pw, name) VALUES (?, ?, ?)";
-	        pstmt = con.prepareStatement(sql);
-	        pstmt.setString(1, id);
-	        pstmt.setString(2, pw);
-	        pstmt.setString(3, name);
-	        updateAmount = pstmt.executeUpdate();
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    } finally {
-	        pool.freeConnection(con, pstmt);
-	    }
-	    return updateAmount > 0 ? true : false;
-	}
-//	public  Vector<ProductBean> mainProduct(){
-//		String selected = Mainpage.selected;
-//		
-//		Connection con = null;
-//		PreparedStatement pstmt = null;
-//		String sql = null;
-//		Vector<ProductBean> pbv = new Vector<>();
-//
-//		if(selected == "항목 1") {
-//			try {
-//				con = pool.getConnection();
-//				
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			
-//		}
-//		
-//		return null;
-//		
-//	}
-	
+
+	//강성웅-리뷰
+
 		public List<starDto> getStarDtoLists(int proIdx) throws SQLException {
 		    Connection con = null;
 		    PreparedStatement pstmt = null;
@@ -563,30 +529,53 @@ public class ShopMgr {
 		    }
 		    return updateAmount > 0 ? true : false;
 		}
-		public boolean updateStarCustomer(int proIdx, int memIdx, String comments, int starRating) {
+		
+//	       Insert into SHOP.MEMBER (MEM_IDX,ID,PW,NAME,GRADE,POINT,JOIN_DATE,TYPE) 
+//	     values (2,'aaaa','1234','홍길동','Bronze',0,to_date('23/02/14','RR/MM/DD'),'일반');
+
+		public boolean updateCustomer(String id, String pw, String nam) throws Exception {
 		    Connection con = null;
 		    PreparedStatement pstmt = null;
+		    ResultSet rs = null;
 		    String sql = null;
 		    int updateAmount = 0;
 		    try {
 		        con = pool.getConnection();
-		        sql = "UPDATE shop.REVIEW SET COMMENTS = ?, STAR_RATING = ?, COM_DATE = ? WHERE PRO_IDX = ? AND MEM_IDX = ?";
+		        // 중복되지 않는 가장 작은 MEM_IDX 값 찾기
+		        sql = "SELECT MEM_IDX FROM MEMBER";
 		        pstmt = con.prepareStatement(sql);
-		        pstmt.setString(1, comments);
-		        pstmt.setInt(2, starRating);
-		        pstmt.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
-		        pstmt.setInt(4, proIdx);
-		        pstmt.setInt(5, memIdx);
+		        rs = pstmt.executeQuery();
+		        List<Integer> memIdxList = new ArrayList<>(); // MEM_IDX 값을 저장할 리스트
+		        while (rs.next()) {
+		            memIdxList.add(rs.getInt("MEM_IDX"));
+		            
+		        }
+		        
+		        System.out.println(memIdxList);
+		        int memIdx = 1;
+		        while (memIdxList.contains(memIdx)) { // MEM_IDX 값 중복 처리
+		            memIdx++;
+		        }
+		        
+		        // INSERT 쿼리 실행
+		        sql = "INSERT INTO shop.MEMBER(MEM_IDX, ID, PW, NAME, GRADE, POINT, JOIN_DATE, TYPE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+		        pstmt = con.prepareStatement(sql);
+		        pstmt.setInt(1, memIdx);
+		        pstmt.setString(2, id);
+		        pstmt.setString(3, pw);
+		        pstmt.setString(4, nam);
+		        pstmt.setString(5, "Bronze");
+		        pstmt.setInt(6, 0);
+		        pstmt.setDate(7, new Date(System.currentTimeMillis()));
+		        pstmt.setString(8, "일반");
 		        updateAmount = pstmt.executeUpdate();
-		    } catch (Exception e) {
+		    } catch (SQLException e) {
 		        e.printStackTrace();
 		    } finally {
-		        pool.freeConnection(con, pstmt);
+		        pool.freeConnection(con, pstmt, rs);
 		    }
-		    return updateAmount > 0 ? true : false;
+		    return updateAmount > 0;
 		}
-		
+
 		//강성웅-리뷰
-
 }
-
