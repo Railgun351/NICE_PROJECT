@@ -4,13 +4,21 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+<<<<<<< HEAD
 import java.util.HashMap;
+=======
+import java.sql.SQLException;
+>>>>>>> 5d8ebba7d0d6cbefdae6cfbf114c445e7a2bb3f2
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.table.DefaultTableModel;
 
+<<<<<<< HEAD
 import oracle.sql.TIMESTAMP;
 import project.bean.CartBean;
+=======
+import project.Mainpage;
+>>>>>>> 5d8ebba7d0d6cbefdae6cfbf114c445e7a2bb3f2
 import project.bean.ProductBean;
 import project.bean.StatisBean;
 
@@ -542,4 +550,48 @@ public class ShopMgr {
 //		}
 //		return vlist;
 //	}
+	public boolean updateMember(String id, String pw, String name) throws Exception {
+	    Connection con = null;
+	    PreparedStatement pstmt = null;
+	    String sql = null;
+	    int updateAmount = 0;
+	    try {
+	        con = pool.getConnection();
+	        sql = "INSERT INTO users (id, pw, name) VALUES (?, ?, ?)";
+	        pstmt = con.prepareStatement(sql);
+	        pstmt.setString(1, id);
+	        pstmt.setString(2, pw);
+	        pstmt.setString(3, name);
+	        updateAmount = pstmt.executeUpdate();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        pool.freeConnection(con, pstmt);
+	    }
+	    return updateAmount > 0 ? true : false;
+	}
+//	public  Vector<ProductBean> mainProduct(){
+//		String selected = Mainpage.selected;
+//		
+//		Connection con = null;
+//		PreparedStatement pstmt = null;
+//		String sql = null;
+//		Vector<ProductBean> pbv = new Vector<>();
+//
+//		if(selected == "항목 1") {
+//			try {
+//				con = pool.getConnection();
+//				
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			
+//		}
+//		
+//		return null;
+//		
+//	}
+
 }
+
