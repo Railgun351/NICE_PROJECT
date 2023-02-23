@@ -40,6 +40,10 @@ public class StarCustomer implements StarObserver {
         return date;
     }
 
+    @Override
+    public String toString() {
+        return "Membername: " + Membername + ", TargetScore: " + targetScore + ", Review: " + review + ", Date: " + date;
+    }
 
 
 
