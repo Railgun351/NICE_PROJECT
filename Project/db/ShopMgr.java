@@ -5,14 +5,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.table.DefaultTableModel;
 
 import project.Mainpage;
-import project.bean.ProductBean;
-import project.bean.StatisBean;
-
+import project.bean.*;
 public class ShopMgr {
 	private DBConnectionMgr pool;
 	private static ShopMgr shopMgr = null;
