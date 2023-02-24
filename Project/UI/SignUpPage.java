@@ -1,59 +1,62 @@
-package Project.UI;
+package project.ui;
 
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Date;
-
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.JTextField;
+import javax.swing.text.StyledEditorKit.BoldAction;
 import javax.swing.JPasswordField;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.UIManager;
-import java.awt.SystemColor;
-import Project.db.ShopMgr;
+import project.db.ShopMgr;
 
 public class SignUpPage extends JFrame {
 
+	private static SignUpPage sup;
 	private JPanel contentPane;
 	private JTextField idText;
 	private JPasswordField pwText;
 	private JTextField nameText;
 	private ShopMgr sm;
+//
+//	public static void main(String[] args) {
+//		
+//
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					SignUpPage frame = new SignUpPage();
+//					frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 
-	public static void main(String[] args) {
-		
-
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					SignUpPage frame = new SignUpPage();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+	public static SignUpPage getInstance() {
+		if (sup == null) {
+			sup = new SignUpPage();
+		} return sup;
 	}
-
+	
 	/**
 	 * Create the frame.
 	 */
-	public SignUpPage() {
+	private SignUpPage() {
+		ShopMgr StrService = ShopMgr.getInstance();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setIconImage(Toolkit.getDefaultToolkit().getImage("./IMG\\LogoIcon.png"));
 		setBounds(100, 100, 540, 800);
+		setLocationRelativeTo(null);
 
 		JPanel panel = new JPanel();
 		ImageIcon imageIcon = new ImageIcon("C:\\Java\\eclipse-workspace\\myJava\\project\\Signup.png");
@@ -61,7 +64,7 @@ public class SignUpPage extends JFrame {
 
 		ImageIcon reImg = new ImageIcon(image);
 
-		// JLabel�� ������ �̹����� ����
+		// JLabel에 조정된 이미지를 설정
 		JLabel label = new JLabel(reImg);
 		label.setBounds(0, 0, 524, 761);
 		getContentPane().add(label);
@@ -72,7 +75,7 @@ public class SignUpPage extends JFrame {
 		idText.setBackground(new Color(252, 252, 252));
 		idText.setBounds(56, 164, 408, 41);
 		idText.setBorder(null);
-		idText.setFont(new Font("����", Font.PLAIN, 23));
+		idText.setFont(new Font("굴림", Font.PLAIN, 23));
 		getContentPane().add(idText);
 		idText.setColumns(10);
 
@@ -86,16 +89,14 @@ public class SignUpPage extends JFrame {
 		nameText.setBackground(new Color(252, 252, 252));
 		nameText.setBounds(56, 324, 408, 41);
 		nameText.setBorder(null);
-		nameText.setFont(new Font("����", Font.PLAIN, 23));
+		nameText.setFont(new Font("굴림", Font.PLAIN, 23));
 		getContentPane().add(nameText);
 		nameText.setColumns(10);
 
-		JButton signUpBtn = new JButton("New button");
+		JButton signUpBtn = new JButton("회원가입");
 		signUpBtn.setOpaque(false);
-		signUpBtn.setBounds(43, 612, 449, 83);
-
-		getContentPane().add(signUpBtn);
-
+		signUpBtn.setFont(new Font("맑은 고딕", Font.BOLD, 22));
+		signUpBtn.setBounds(43, 612, 200, 83);
 		signUpBtn.addActionListener((ActionListener) new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// Get the user input from the text fields
@@ -107,21 +108,31 @@ public class SignUpPage extends JFrame {
 				if (id.isEmpty() || pw.isEmpty() || name.isEmpty()) {
 					JOptionPane.showMessageDialog(null, "Please fill out all fields.");
 					return;
-				}
-
-				// Insert the user data into the database
-				boolean result = updateMember(id, pw, name);
-				if (result) {
-					JOptionPane.showMessageDialog(null, "회원가입이 완료되었습니다.");
 				} else {
-					JOptionPane.showMessageDialog(null, "회원가입 실패");
+					// Insert the user data into the database
+					if (StrService.signUp(id, pw, name)) {
+						JOptionPane.showMessageDialog(null, "회원가입이 완료되었습니다.");
+						LoginPage lp = LoginPage.getInstance();
+						lp.setVisible(true);
+						dispose();
+					} else
+						JOptionPane.showMessageDialog(null, "회원가입 실패!");
 				}
 			}
 		});
-
-	}
-
-	protected boolean updateMember(String id, String pw, String name) {
-		return false;
+		getContentPane().add(signUpBtn);
+		
+		JButton cancleBtn = new JButton("로그인 화면으로");
+		cancleBtn.setOpaque(false);
+		cancleBtn.setFont(new Font("맑은 고딕", Font.BOLD, 22));
+		cancleBtn.setBounds(280, 612, 200, 83);
+		cancleBtn.addActionListener((ActionListener) new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				LoginPage lp = LoginPage.getInstance();
+				lp.setVisible(true);
+				dispose();
+			}
+		});
+		getContentPane().add(cancleBtn);
 	}
 }

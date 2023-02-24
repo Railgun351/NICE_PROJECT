@@ -21,4 +21,10 @@
 /FactoryItemFromMenu.class
 /FactoryItemPrinter.class
 /Factory_main.class
+<<<<<<< HEAD
 /CartBean.class
+=======
+/starDto.class
+>>>>>>> 1bcb2565a48069b5bf374ffee30a6c004f916581
+/MemberBean.class
+/MainProductBean.class

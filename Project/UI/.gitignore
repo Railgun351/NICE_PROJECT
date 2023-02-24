@@ -39,6 +39,7 @@
 >>>>>>> 89a87cd8ecf3382417b06d8553bde54dc1c8011c
 >>>>>>> 195e267cf522ef473feebdd4409419dad7eb57e6
 <<<<<<< HEAD
+<<<<<<< HEAD
 /Admin_Statistics$4.class
 /EWT$AddReveiw.class
 /EWT$AddReveiw$1.class
@@ -72,3 +73,70 @@
 /SignUpPage$1.class
 /SignUpPage$2.class
 >>>>>>> 5d8ebba7d0d6cbefdae6cfbf114c445e7a2bb3f2
+=======
+/EWT$15.class
+/EWT$16.class
+/EWT$17.class
+/EWT$18.class
+/EWT$19.class
+/EWT$20.class
+/CreateReview$1.class
+/CreateReview$2.class
+/CreateReview$3.class
+/CreateReview.class
+/CreateReview$4.class
+>>>>>>> 1bcb2565a48069b5bf374ffee30a6c004f916581
+/d$21.class
+/Shopcart.class
+/Shopcart$1.class
+/Shopcart$2.class
+/Shopcart$3.class
+/Shopcart$4.class
+/Shopcart$5.class
+/Shopcart$6.class
+/AdminMain$1.class
+/AdminMain$2.class
+/AdminMain$3.class
+/AdminMain$4.class
+/AdminMain$5.class
+/AdminMain$6.class
+/AdminMain$7.class
+/AdminMain$8.class
+/AdminMain.class
+/Admin_AddInventory$10.class
+/Admin_AddInventory$7.class
+/Admin_AddInventory$8.class
+/Admin_AddInventory$9.class
+/Admin_Statistics$5.class
+/Admin_Statistics$6.class
+/Admin_Statistics$7.class
+/Mainpage$10.class
+/Mainpage$3.class
+/Mainpage$4.class
+/Mainpage$5.class
+/Mainpage$6.class
+/Mainpage$7.class
+/Mainpage$8.class
+/Mainpage$9.class
+/AddProduct.class
+/Login1.class
+/Login1$1.class
+/Login1$2.class
+/Login1$3.class
+/Login1$4.class
+/Login1$5.class
+/AddProduct$1.class
+/AddProduct$2.class
+/AddProduct$3.class
+/AddProduct$4.class
+/AddProduct$5.class
+/AddProduct$6.class
+/AddProduct$7.class
+/AddProduct$8.class
+/LoginPage$1.class
+/LoginPage$2.class
+/LoginPage$3.class
+/LoginPage$4.class
+/LoginPage$5.class
+/LoginPage.class
+/AddProduct$9.class

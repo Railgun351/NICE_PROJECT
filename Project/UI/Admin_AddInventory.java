@@ -23,6 +23,7 @@ import javax.swing.SwingConstants;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -48,6 +49,7 @@ import javax.swing.Icon;
 
 public class Admin_AddInventory extends JFrame {
 
+	private static Admin_AddInventory aa;
 	private JPanel contentPane;
 	private JTable table;
 	private JTextField textField;
@@ -62,31 +64,39 @@ public class Admin_AddInventory extends JFrame {
 	private Vector<ProductBean> pbv = new Vector<>();
 	private ImageIcon icon = new ImageIcon("IMG\\addInven.png");
 
+	public static Admin_AddInventory getinstance() {
+		if (aa == null) {
+			aa = new Admin_AddInventory();
+		} return aa;
+	}
+	
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Admin_AddInventory frame = new Admin_AddInventory();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+//	public static void main(String[] args) {
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					Admin_AddInventory frame = new Admin_AddInventory();
+//					frame.
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 
 	/**
 	 * Create the frame.
 	 */
-	public Admin_AddInventory() {
+	private Admin_AddInventory() {
 		sm = ShopMgr.getInstance();
+		setIconImage(Toolkit.getDefaultToolkit().getImage("./IMG\\LogoIcon.png"));
 		setResizable(false);
 		setTitle("관리자 기존 상품 재고 추가");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 568, 769);
+		setLocationRelativeTo(null);
 		JLayeredPane lp = new JLayeredPane();
 		lp.setLocation(0, 0);
 		lp.setSize(550, 731);
@@ -105,13 +115,42 @@ public class Admin_AddInventory extends JFrame {
 
 		JButton btn_back = new JButton("");
 		btn_back.setContentAreaFilled(false);
-		btn_back.setBounds(28, 21, 30, 30);
+		btn_back.setBounds(10, 10, 40, 40);
+		btn_back.setIcon(resizeIcon(new ImageIcon("./IMG\\BACK.png"), 40, 40));
+		btn_back.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				AdminMain am = AdminMain.getinstance();
+				am.setVisible(true);
+				dispose();
+			}
+		});
 		lp.add(btn_back);
 
-		JButton btn_Exit = new JButton("");
-		btn_Exit.setContentAreaFilled(false);
-		btn_Exit.setBounds(482, 25, 40, 40);
-		lp.add(btn_Exit);
+		JButton btn_Home = new JButton("");
+		btn_Home.setContentAreaFilled(false);
+		btn_Home.setBorderPainted(false);
+		btn_Home.setBounds(482, 10, 40, 40);
+		btn_Home.setIcon(resizeIcon(new ImageIcon("./IMG\\HomeNull.png"), 40, 40));
+		btn_Home.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btn_Home.setIcon(resizeIcon(new ImageIcon("./IMG\\HomeFill.png"), 40, 40));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btn_Home.setIcon(resizeIcon(new ImageIcon("./IMG\\HomeNull.png"), 40, 40));
+			}
+		});
+		btn_Home.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Mainpage mp = Mainpage.getInstance();
+				mp.setVisible(true);
+				dispose();
+			}
+		});
+		lp.add(btn_Home);
 
 		JComboBox comboBox = new JComboBox();
 		comboBox.setBounds(34, 59, 97, 23);
@@ -120,6 +159,7 @@ public class Admin_AddInventory extends JFrame {
 
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(34, 92, 475, 341);
+		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 		lp.add(scrollPane);
 		
 		lblNewLabel_1 = new JLabel("");
@@ -189,7 +229,19 @@ public class Admin_AddInventory extends JFrame {
 		btn_Confirm.setFocusPainted(false);
 		btn_Confirm.setBorderPainted(false);
 		btn_Confirm.setContentAreaFilled(false);
-		btn_Confirm.setBounds(284, 637, 104, 50);
+		btn_Confirm.setIcon(resizeIcon(new ImageIcon("./IMG\\AssignNull.png"), 50, 50));
+		btn_Confirm.setBounds(310, 637, 50, 50);
+		btn_Confirm.setToolTipText("재고 추가");
+		btn_Confirm.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btn_Confirm.setIcon(resizeIcon(new ImageIcon("./IMG\\AssignFill.png"), 40, 40));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btn_Confirm.setIcon(resizeIcon(new ImageIcon("./IMG\\AssignNull.png"), 40, 40));
+			}
+		});
 		btn_Confirm.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -209,8 +261,20 @@ public class Admin_AddInventory extends JFrame {
 		btn_Delete.setFocusPainted(false);
 		btn_Delete.setContentAreaFilled(false);
 		btn_Delete.setBorderPainted(false);
+		btn_Delete.setIcon(resizeIcon(new ImageIcon("./IMG\\DeleteNull.png"), 50, 50));
 		btn_Delete.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		btn_Delete.setBounds(400, 637, 97, 50);
+		btn_Delete.setBounds(420, 637, 50, 50);
+		btn_Delete.setToolTipText("상품 삭제");
+		btn_Delete.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btn_Delete.setIcon(resizeIcon(new ImageIcon("./IMG\\DeleteFill.png"), 40, 40));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btn_Delete.setIcon(resizeIcon(new ImageIcon("./IMG\\DeleteNull.png"), 40, 40));
+			}
+		});
 		btn_Delete.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -240,9 +304,24 @@ public class Admin_AddInventory extends JFrame {
 				updateTable(cate, dtm);
 			}
 		});
+		
+		JLabel lbLogo = new JLabel();
+		lbLogo.setBounds(80, 10, 69, 39);
+		lbLogo.setIcon(resizeIcon(new ImageIcon("./IMG\\LOGO.png"), 69, 39));
+		lp.add(lbLogo);
+		
 		updateTable("전체", dtm);
 		sm.selectPro("전체", dtm);
+		setVisible(true);
 		validate();
+	}
+	
+	public Icon resizeIcon(ImageIcon ii, int w, int h) {
+		ImageIcon ic = ii;
+		Image img = ic.getImage();
+		Image img2 = img.getScaledInstance(w, h, Image.SCALE_SMOOTH);
+		ic = new ImageIcon(img2);
+		return ic;
 	}
 	
 	public void tableSelect() {
@@ -253,9 +332,9 @@ public class Admin_AddInventory extends JFrame {
 		textField_1.setText("카테고리: " + (String) table.getModel().getValueAt(row, 2));
 		textField_2.setText(Integer.toString((int) table.getModel().getValueAt(row, 3)) + "원");
 		for (int i = 0; i < pbv.size(); i++) {
-			System.out.println(Pro_idx + "/" + pbv.get(i).getPRO_IDX());
-			if (pbv.get(i).getPRO_IDX() == Pro_idx) {
-				path = pbv.get(i).getIMG_ADDRESS();
+			System.out.println(Pro_idx + "/" + pbv.get(i).getProIdx());
+			if (pbv.get(i).getProIdx() == Pro_idx) {
+				path = pbv.get(i).getImgAddress();
 				break;
 			}
 		}

@@ -4,15 +4,11 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Label;
-import java.awt.Rectangle;
-import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.ImageObserver;
 import java.math.BigInteger;
-import java.text.AttributedCharacterIterator;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
@@ -25,36 +21,55 @@ import project.bean.*;
 import project.db.ShopMgr;
 
 import java.awt.TextField;
+import java.awt.Toolkit;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.SystemColor;
 import java.awt.Font;
-import java.awt.FontMetrics;
 
-public class shopcart extends JFrame implements ChangeListener, ActionListener{
+public class Shopcart extends JFrame implements ChangeListener, ActionListener{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private static Shopcart sc;
 //	JScrollPane scrollPane;
 	ImageIcon icon;
 	JPanel dataPanel;
 	ShopMgr sm;
 	String ImgName = "./IMG\\";
-	private String memName;
-	private int memIdx;
+	private JLabel noData;
+	private MemberBean mem;
+	private JLabel subTitle;
 	private Vector<CartBean> cartBV = new Vector<>();
 	private JLabel totalPriceLb;
 	private long totalPrice;
-	public shopcart(String memName, int memIdx) {
-
+	
+	public static Shopcart getInstance() {
+		if (sc == null) {
+			sc = new Shopcart(new MemberBean());
+		} return sc;
+	}
+	
+	public void refresh(MemberBean mem) {
+		this.mem = mem;
+		setTitle(mem.getName()+"님의 장바구니 페이지");
+		subTitle.setText(mem.getName()+"님의 장바구니 페이지");
+		addData();
+	}
+	
+	private Shopcart(MemberBean mem) {
+		setIconImage(Toolkit.getDefaultToolkit().getImage("./IMG\\LogoIcon.png"));
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setSize(420, 665);
+		setVisible(true);
+		setLocationRelativeTo(null);
 		//DB연결
 		sm = ShopMgr.getInstance();
 		
-		this.memIdx = memIdx;
-		this.memName = memName;
-
-		icon = new ImageIcon(ImgName + "back2.PNG");
+		this.mem = mem;
+		setTitle(mem.getName()+"님의 장바구니 페이지");
+		icon = new ImageIcon(ImgName + "CartBack.PNG");
 
 		// 배경 Panel 생성후 컨텐츠페인으로 지정
 		JPanel background = new JPanel() {
@@ -74,6 +89,18 @@ public class shopcart extends JFrame implements ChangeListener, ActionListener{
 		background.setBackground(SystemColor.menu);
 		background.setForeground(Color.LIGHT_GRAY);
 		background.setLayout(null);
+		
+		noData = new JLabel();
+		noData.setBounds(52, 172, 300, 300);
+		ImageIcon ic = new ImageIcon(ImgName+"NoProduct.png");
+		Image img = ic.getImage();
+		Image img2 = img.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+		ic = new ImageIcon(img2);
+		noData.setIcon(ic);
+		noData.setOpaque(true);
+		noData.setVisible(false);
+		background.add(noData);
+		
 //		scrollPane = new JScrollPane(background);
 		totalPriceLb = new JLabel("0");
 		totalPriceLb.setBounds(0, 530, 400, 30);
@@ -83,50 +110,66 @@ public class shopcart extends JFrame implements ChangeListener, ActionListener{
 		totalPriceLb.setHorizontalAlignment(JLabel.RIGHT);
 		background.add(totalPriceLb);
 
+		JButton home = new JButton("");
+		home.setIcon(resizeIcon(new ImageIcon(ImgName + "HomeNull.PNG"), 40, 40));
+		home.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				home.setIcon(resizeIcon(new ImageIcon(ImgName + "HomeNull.PNG"), 40, 40));
+				Mainpage mp = Mainpage.getInstance();
+				mp.setVisible(true);
+				dispose();
+			}
+		});
+		home.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				home.setIcon(resizeIcon(new ImageIcon(ImgName + "HomeFill.PNG"), 40, 40));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				home.setIcon(resizeIcon(new ImageIcon(ImgName + "HomeNull.PNG"), 40, 40));
+			}
+		});
+		home.setBounds(300, 10, 40, 40);
+		home.setOpaque(true);
+		home.setContentAreaFilled(false);
+		home.setBorderPainted(false);
+		background.add(home);
+		
 		JButton logout = new JButton("");
-		logout.setIcon(new ImageIcon(ImgName + "LOGOUT.PNG"));
 		logout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				logout.setIcon(resizeIcon(new ImageIcon(ImgName + "LogOutNull.PNG"), 40, 40));
+				LoginPage lp = LoginPage.getInstance();
+				lp.setVisible(true);
+				dispose();
 			}
 		});
-		logout.setBounds(360, 10, 31, 39);
-		logout.setOpaque(true);
+		logout.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				logout.setIcon(resizeIcon(new ImageIcon(ImgName + "LogOutFill.PNG"), 40, 40));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				logout.setIcon(resizeIcon(new ImageIcon(ImgName + "LogOutNull.PNG"), 40, 40));
+			}
+		});
+		logout.setIcon(resizeIcon(new ImageIcon(ImgName + "LogOutNull.PNG"), 40, 40));
+		logout.setBounds(350, 10, 40, 40);
+		logout.setContentAreaFilled(false);
+		logout.setBorderPainted(false);
 		background.add(logout);
-
-		JButton back = new JButton("");
-		back.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		back.setIcon(new ImageIcon(ImgName + "BACK.PNG"));
-		back.setBounds(12, 10, 18, 39);
-		background.add(back);
-
-//		JComboBox comboBox = new JComboBox(arrays[0]);
-//
-//		comboBox.setBounds(244, 271, 54, 23);
-//		background.add(comboBox);
-//
-//		comboBox.addActionListener(new ActionListener() {
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				String selectedItem = (String) comboBox.getSelectedItem();
-//
-//				add1 = Integer.parseInt(selectedItem) * (price[0]);
-//				System.out.print(add1);
-//				add3 = add1 + add2;
-//				가격.setText(Integer.toString(add3));
-//			}
-//		});
 		
 		dataPanel = new JPanel(new GridLayout(0,1,10,10));
-		dataPanel.setBackground(Color.BLACK);
+		dataPanel.setBackground(Color.WHITE);
 		
 		JScrollPane sp = new JScrollPane(dataPanel);
 		sp.setBounds(0, 120, 404, 404);
+		sp.getVerticalScrollBar().setUnitIncrement(16);
 		background.add(sp);
 		
-		JLabel subTitle = new JLabel(memName+"님의 장바구니");
+		subTitle = new JLabel(mem.getName()+"님의 장바구니");
 		subTitle.setFont(new Font("돋움체", Font.PLAIN, 18));
 		subTitle.setHorizontalAlignment(JLabel.CENTER);
 		subTitle.setBounds(0, 84, 405, 33);
@@ -134,9 +177,9 @@ public class shopcart extends JFrame implements ChangeListener, ActionListener{
 
 		addData();
 		
-		JButton immediatepurchase = new JButton("");
-		immediatepurchase.setIcon(new ImageIcon(ImgName + "주문하기.png"));
-		immediatepurchase.addActionListener(new ActionListener() {
+		JButton immediatePurchase = new JButton("");
+		immediatePurchase.setIcon(new ImageIcon(ImgName + "주문하기.png"));
+		immediatePurchase.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int choice = JOptionPane.showConfirmDialog(null, "장바구니에 있는 모든 상품을 주문합니다.","안내",JOptionPane.YES_NO_OPTION);
 				if (choice == JOptionPane.YES_OPTION) {
@@ -146,12 +189,20 @@ public class shopcart extends JFrame implements ChangeListener, ActionListener{
 				}
 			}
 		});
-		immediatepurchase.setBounds(0, 570, 405, 58);
-		background.add(immediatepurchase);
-
+		immediatePurchase.setBounds(0, 570, 405, 58);
+		background.add(immediatePurchase);
+		
 //		setContentPane(scrollPane);
 		setContentPane(background);
 		validate();
+	}
+	
+	public Icon resizeIcon(ImageIcon ii, int w, int h) {
+		ImageIcon ic = ii;
+		Image img = ic.getImage();
+		Image img2 = img.getScaledInstance(w, h, Image.SCALE_SMOOTH);
+		ic = new ImageIcon(img2);
+		return ic;
 	}
 
 	public JPanel createData(String proName, int proPrice, int proIdx, int quantity) {
@@ -203,7 +254,7 @@ public class shopcart extends JFrame implements ChangeListener, ActionListener{
 		btn.addActionListener(this);
 		panel.add(btn);
 		
-		cb.setMemIdx(memIdx);
+		cb.setMemIdx(mem.getIdx());
 		cb.setProIdx(proIdx);
 		cb.setProName(proName);
 		cb.setProPrice(proPrice);
@@ -220,8 +271,9 @@ public class shopcart extends JFrame implements ChangeListener, ActionListener{
 	public void addData() {
 		dataPanel.removeAll();
 		totalPrice = 0;
-		HashMap<Integer, CartBean> cartMap = sm.selectCart(memIdx);
+		HashMap<Integer, CartBean> cartMap = sm.selectCart(mem.getIdx());
 		if (cartMap.size() > 0) {
+			noData.setVisible(false);
 			for (int key:cartMap.keySet()) {
 				String proName = cartMap.get(key).getProName();
 				int proPrice = cartMap.get(key).getProPrice();
@@ -232,10 +284,10 @@ public class shopcart extends JFrame implements ChangeListener, ActionListener{
 				dataPanel.add(p);
 			}
 		} else {
-			
+			noData.setVisible(true);
+			totalPriceLb.setText("합계 : 0원");
 		}
 		repaint();
-		validate();
 	}
 	
 	public String toWon(long Amount) {
@@ -264,27 +316,28 @@ public class shopcart extends JFrame implements ChangeListener, ActionListener{
 	
 	private void confirmOrder() {
 		if (cartBV.size() > 0) {
-			for (int i = 0; i < cartBV.size(); i++) {
-				if (!sm.updateCartFromPro(cartBV.get(i), 1)) {
+			while (cartBV.size() != 0) {
+				if (!sm.updateCartFromPro(cartBV.get(0), 1)) {
 					JOptionPane.showMessageDialog(null, "결제 중 문제가 발생하였습니다.\n다시 한번 확인해주세요.","안내",JOptionPane.ERROR_MESSAGE);
 					break;
 				}
-				if (i == cartBV.size()-1) {
-					JOptionPane.showMessageDialog(null, "상품 주문 및 결제가 완료되었습니다.\n 결제 금액 : "+toWon(totalPrice),"안내",JOptionPane.INFORMATION_MESSAGE);
-					addData();
-				}
+				cartBV.remove(0);
+			}
+			if (cartBV.size() == 0) {
+				JOptionPane.showMessageDialog(null, "상품 주문 및 결제가 완료되었습니다.\n 결제 금액 : "+toWon(totalPrice),"안내",JOptionPane.INFORMATION_MESSAGE);
+				addData();
 			}
 		} else {
 			JOptionPane.showMessageDialog(null, "결제 할 상품이 없습니다.\n다시 한번 확인해주세요.","안내",JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
-	public static void main(String[] args) {
-		shopcart frame = new shopcart("서수정",1);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(420, 665);
-		frame.setVisible(true);
-	}
+//	public static void main(String[] args) {
+//		Shopcart frame = new Shopcart("서수정",1);
+//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		frame.setSize(420, 665);
+//		frame.setVisible(true);
+//	}
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
