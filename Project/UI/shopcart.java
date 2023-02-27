@@ -23,17 +23,18 @@ import project.db.ShopMgr;
 import java.awt.TextField;
 import java.awt.Toolkit;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.SystemColor;
 import java.awt.Font;
 
-public class Shopcart extends JFrame implements ChangeListener, ActionListener{
+public class Shopcart extends JFrame implements ChangeListener, ActionListener, Runnable{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	private static Shopcart sc;
-//	JScrollPane scrollPane;
+	private JScrollPane sp;
 	ImageIcon icon;
 	JPanel dataPanel;
 	ShopMgr sm;
@@ -42,8 +43,18 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener{
 	private MemberBean mem;
 	private JLabel subTitle;
 	private Vector<CartBean> cartBV = new Vector<>();
+	private CustomMethod cm = new CustomMethod();
 	private JLabel totalPriceLb;
+	private int prePage;
 	private long totalPrice;
+	private boolean isPopUp;
+	private JPanel background;
+	private JPanel panelPopUp;
+	private JLabel lbPopUpGrade;
+	private JLabel lbPopUpPoint;
+	private JButton btnMyPage;
+	private JLabel lbPopUpName;
+	private JButton btnClosePopUp;
 	
 	public static Shopcart getInstance() {
 		if (sc == null) {
@@ -51,10 +62,14 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener{
 		} return sc;
 	}
 	
-	public void refresh(MemberBean mem) {
+	public void refresh(MemberBean mem, int prePage) {
 		this.mem = mem;
+		this.prePage = prePage;
 		setTitle(mem.getName()+"님의 장바구니 페이지");
 		subTitle.setText(mem.getName()+"님의 장바구니 페이지");
+		lbPopUpName.setText(mem.getName()+"님");
+		lbPopUpGrade.setText("등급 : "+mem.getGrade());
+		lbPopUpPoint.setText("포인트 : "+mem.getPoint());
 		addData();
 	}
 	
@@ -72,7 +87,7 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener{
 		icon = new ImageIcon(ImgName + "CartBack.PNG");
 
 		// 배경 Panel 생성후 컨텐츠페인으로 지정
-		JPanel background = new JPanel() {
+		background = new JPanel() {
 			/**
 			 * 
 			 */
@@ -89,6 +104,69 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener{
 		background.setBackground(SystemColor.menu);
 		background.setForeground(Color.LIGHT_GRAY);
 		background.setLayout(null);
+		
+		panelPopUp = new JPanel();
+		panelPopUp.setBounds(405, 0, 150, 210);
+		panelPopUp.setBackground(new Color(200,200,200,240));
+		
+		background.add(panelPopUp);
+		panelPopUp.setLayout(null);
+		
+		btnClosePopUp = new JButton("");
+		btnClosePopUp.setContentAreaFilled(false);
+		btnClosePopUp.setBorderPainted(false);
+		btnClosePopUp.setBounds(12, 10, 30, 30);
+		btnClosePopUp.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\XNull.png"), 30, 30));
+		btnClosePopUp.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btnClosePopUp.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\XFill.png"), 30, 30));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btnClosePopUp.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\XNull.png"), 30, 30));
+			}
+		});
+		btnClosePopUp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				btnClosePopUp.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\XNull.png"), 30, 30));
+				togglePopUp();
+			}
+		});
+		panelPopUp.add(btnClosePopUp);
+		
+		lbPopUpName = new JLabel("New label");
+		lbPopUpName.setFont(new Font("맑은 고딕", Font.BOLD, 20));
+		lbPopUpName.setBounds(12, 44, 126, 30);
+		panelPopUp.add(lbPopUpName);
+		
+		lbPopUpGrade = new JLabel("New label");
+		lbPopUpGrade.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
+		lbPopUpGrade.setBounds(12, 84, 126, 30);
+		panelPopUp.add(lbPopUpGrade);
+		
+		lbPopUpPoint = new JLabel("New label");
+		lbPopUpPoint.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
+		lbPopUpPoint.setBounds(12, 124, 126, 30);
+		panelPopUp.add(lbPopUpPoint);
+		
+		btnMyPage = new JButton("마이페이지");
+		btnMyPage.setContentAreaFilled(false);
+		btnMyPage.setBounds(12, 164, 126, 30);
+		btnMyPage.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				MyPage myp = MyPage.getInstance();
+				myp.refresh(sc.mem, Constant.PREPAGECART);
+				myp.setLocationRelativeTo(sc);
+				myp.setVisible(true);
+				togglePopUp();
+				dispose();
+			}
+		});
+		panelPopUp.add(btnMyPage);
 		
 		noData = new JLabel();
 		noData.setBounds(52, 172, 300, 300);
@@ -110,12 +188,36 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener{
 		totalPriceLb.setHorizontalAlignment(JLabel.RIGHT);
 		background.add(totalPriceLb);
 
+		JButton btnMyAc = new JButton("");
+		btnMyAc.setBorderPainted(false);
+		btnMyAc.setContentAreaFilled(false);
+		btnMyAc.setIcon(resizeIcon(new ImageIcon("./IMG\\\\MyAcNull.png"), 40, 40));
+		btnMyAc.setBounds(350, 10, 40, 40);
+		btnMyAc.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btnMyAc.setIcon(resizeIcon(new ImageIcon("./IMG\\\\MyAcFill.png"), 40, 40));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btnMyAc.setIcon(resizeIcon(new ImageIcon("./IMG\\\\MyAcNull.png"), 40, 40));
+			}
+		});
+		btnMyAc.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				togglePopUp();
+			}
+		});
+		background.add(btnMyAc);
+		
 		JButton home = new JButton("");
 		home.setIcon(resizeIcon(new ImageIcon(ImgName + "HomeNull.PNG"), 40, 40));
 		home.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				home.setIcon(resizeIcon(new ImageIcon(ImgName + "HomeNull.PNG"), 40, 40));
 				Mainpage mp = Mainpage.getInstance();
+				mp.setLocationRelativeTo(sc);
 				mp.setVisible(true);
 				dispose();
 			}
@@ -130,7 +232,7 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener{
 				home.setIcon(resizeIcon(new ImageIcon(ImgName + "HomeNull.PNG"), 40, 40));
 			}
 		});
-		home.setBounds(300, 10, 40, 40);
+		home.setBounds(250, 10, 40, 40);
 		home.setOpaque(true);
 		home.setContentAreaFilled(false);
 		home.setBorderPainted(false);
@@ -141,6 +243,7 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener{
 			public void actionPerformed(ActionEvent e) {
 				logout.setIcon(resizeIcon(new ImageIcon(ImgName + "LogOutNull.PNG"), 40, 40));
 				LoginPage lp = LoginPage.getInstance();
+				lp.setLocationRelativeTo(sc);
 				lp.setVisible(true);
 				dispose();
 			}
@@ -156,7 +259,7 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener{
 			}
 		});
 		logout.setIcon(resizeIcon(new ImageIcon(ImgName + "LogOutNull.PNG"), 40, 40));
-		logout.setBounds(350, 10, 40, 40);
+		logout.setBounds(300, 10, 40, 40);
 		logout.setContentAreaFilled(false);
 		logout.setBorderPainted(false);
 		background.add(logout);
@@ -164,7 +267,7 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener{
 		dataPanel = new JPanel(new GridLayout(0,1,10,10));
 		dataPanel.setBackground(Color.WHITE);
 		
-		JScrollPane sp = new JScrollPane(dataPanel);
+		sp = new JScrollPane(dataPanel);
 		sp.setBounds(0, 120, 404, 404);
 		sp.getVerticalScrollBar().setUnitIncrement(16);
 		background.add(sp);
@@ -181,16 +284,37 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener{
 		immediatePurchase.setIcon(new ImageIcon(ImgName + "주문하기.png"));
 		immediatePurchase.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int choice = JOptionPane.showConfirmDialog(null, "장바구니에 있는 모든 상품을 주문합니다.","안내",JOptionPane.YES_NO_OPTION);
+				int choice = JOptionPane.showConfirmDialog(sc, "장바구니에 있는 모든 상품을 주문합니다.","안내",JOptionPane.YES_NO_OPTION);
 				if (choice == JOptionPane.YES_OPTION) {
 					confirmOrder();
 				} else {
-					JOptionPane.showMessageDialog(null, "결재를 취소했습니다.","안내",JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(sc, "결재를 취소했습니다.","안내",JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
 		});
 		immediatePurchase.setBounds(0, 570, 405, 58);
 		background.add(immediatePurchase);
+		
+		JButton btn_back = new JButton("");
+		btn_back.setIcon(resizeIcon(new ImageIcon("./IMG\\BACK.png"), 40, 40));
+		btn_back.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (sc.prePage == Constant.PREPAGEMAIN) {
+					Mainpage mp = Mainpage.getInstance();
+					mp.setLocationRelativeTo(sc);
+					mp.setVisible(true);
+					dispose();
+				} else if (sc.prePage == Constant.PREPAGEPRODUCTINFO) {
+					productInfo pi = productInfo.getInstance();
+					pi.setLocationRelativeTo(sc);
+					pi.setVisible(true);
+					dispose();
+				}
+			}
+		});
+		btn_back.setContentAreaFilled(false);
+		btn_back.setBounds(10, 10, 40, 40);
+		background.add(btn_back);
 		
 //		setContentPane(scrollPane);
 		setContentPane(background);
@@ -207,9 +331,6 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener{
 
 	public JPanel createData(String proName, int proPrice, int proIdx, int quantity) {
 		JPanel panel = new JPanel();
-//		panel.setBounds(10,y+10,420, 50);
-//		panel.setSize(420, 50);
-//		panel.setPreferredSize(new Dimension(420, 50));
 		panel.setLayout(null);
 		
 		CartBean cb = new CartBean();
@@ -271,7 +392,7 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener{
 	public void addData() {
 		dataPanel.removeAll();
 		totalPrice = 0;
-		HashMap<Integer, CartBean> cartMap = sm.selectCart(mem.getIdx());
+		HashMap<Integer, CartBean> cartMap = sm.selectCart(mem.getIdx(), Constant.CARTORDER);
 		if (cartMap.size() > 0) {
 			noData.setVisible(false);
 			for (int key:cartMap.keySet()) {
@@ -317,18 +438,18 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener{
 	private void confirmOrder() {
 		if (cartBV.size() > 0) {
 			while (cartBV.size() != 0) {
-				if (!sm.updateCartFromPro(cartBV.get(0), 1)) {
-					JOptionPane.showMessageDialog(null, "결제 중 문제가 발생하였습니다.\n다시 한번 확인해주세요.","안내",JOptionPane.ERROR_MESSAGE);
+				if (!sm.updateCartFromPro(cartBV.get(0), Constant.CARTORDERCOMPLETE)) {
+					JOptionPane.showMessageDialog(sc, "결제 중 문제가 발생하였습니다.\n다시 한번 확인해주세요.","안내",JOptionPane.ERROR_MESSAGE);
 					break;
 				}
 				cartBV.remove(0);
 			}
 			if (cartBV.size() == 0) {
-				JOptionPane.showMessageDialog(null, "상품 주문 및 결제가 완료되었습니다.\n 결제 금액 : "+toWon(totalPrice),"안내",JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(sc, "상품 주문 및 결제가 완료되었습니다.\n 결제 금액 : "+toWon(totalPrice),"안내",JOptionPane.INFORMATION_MESSAGE);
 				addData();
 			}
 		} else {
-			JOptionPane.showMessageDialog(null, "결제 할 상품이 없습니다.\n다시 한번 확인해주세요.","안내",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(sc, "결제 할 상품이 없습니다.\n다시 한번 확인해주세요.","안내",JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
@@ -371,11 +492,60 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener{
 			}
 		}
 		if (sm.updateCartFromPro(cb, 2)) {
-			JOptionPane.showMessageDialog(null, "장바구니에서 해당 상품이 삭제되었습니다.","안내",JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(sc, "장바구니에서 해당 상품이 삭제되었습니다.","안내",JOptionPane.INFORMATION_MESSAGE);
 			cartBV.remove(idx);
 			addData();
 		} else {
-			JOptionPane.showMessageDialog(null, "상품삭제 중 문제가 발생하였습니다.\n다시 한번 확인해주세요.","안내",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(sc, "상품삭제 중 문제가 발생하였습니다.\n다시 한번 확인해주세요.","안내",JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	public void togglePopUp() {
+		if (isPopUp) {
+			new Thread(this).start();
+			Component[] components = background.getComponents();
+			for (Component component : components) {
+			    component.setEnabled(true);
+			}
+			for (int i = 0; i < cartBV.size(); i++) {
+				cartBV.get(i).getBtn().setEnabled(true);
+			}
+			sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		} else {
+			new Thread(this).start();
+			Component[] components = background.getComponents();
+			for (Component component : components) {
+			    component.setEnabled(false);
+			}
+			for (int i = 0; i < cartBV.size(); i++) {
+				cartBV.get(i).getBtn().setEnabled(false);
+			}
+			sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		}
+	}
+	
+	@Override
+	public void run() {
+		try {
+			if (isPopUp) {
+				isPopUp = !isPopUp;
+				btnClosePopUp.setEnabled(false);
+				for (int i = 0; i < 150; i++) {
+					int x = panelPopUp.getX() + 1;
+					panelPopUp.setLocation(x, panelPopUp.getY());
+					Thread.sleep((long) Math.pow(i/50, 2));
+				}
+			} else {
+				isPopUp = !isPopUp;
+				for (int i = 0; i < 150; i++) {
+					int x = panelPopUp.getX() - 1;
+					panelPopUp.setLocation(x, panelPopUp.getY());
+					Thread.sleep((long) Math.pow(i/50, 2));
+				}
+				btnClosePopUp.setEnabled(true);
+			}
+		} catch (Exception e) {
+			e.getStackTrace();
 		}
 	}
 }

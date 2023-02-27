@@ -112,6 +112,7 @@ public class Admin_Statistics extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				AdminMain am = AdminMain.getinstance();
+				am.setLocationRelativeTo(as);
 				am.setVisible(true);
 				dispose();
 			}
@@ -137,7 +138,9 @@ public class Admin_Statistics extends JFrame {
 		btn_Home.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				btn_Home.setIcon(resizeIcon(new ImageIcon("./IMG\\HomeNull.png"), 40, 40));
 				Mainpage mp = Mainpage.getInstance();
+				mp.setLocationRelativeTo(as);
 				mp.setVisible(true);
 				dispose();
 			}
@@ -350,7 +353,7 @@ public class Admin_Statistics extends JFrame {
 					data_panel.add(p);
 				}
 			} else {
-				JOptionPane.showMessageDialog(null, "연도를 선택해야 합니다.", "경고", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(as, "연도를 선택해야 합니다.", "경고", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		data_panel.repaint();

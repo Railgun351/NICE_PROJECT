@@ -1,23 +1,26 @@
 package project.db;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+
+import oracle.jdbc.Const;
 import project.bean.CartBean;
+import project.bean.Constant;
 import project.bean.MainProductBean;
 import project.bean.MemberBean;
+import project.bean.OrderLogBean;
 import project.bean.ProductBean;
+import project.bean.ReviewBean;
 import project.bean.StatisBean;
-import project.bean.starDto;
+import project.ui.Admin_AddInventory;
+import project.ui.productInfo;
 
 public class ShopMgr {
 	private DBConnectionMgr pool;
@@ -35,6 +38,26 @@ public class ShopMgr {
 	}
 
 	// 송명준 재고추가, 통계, 메인페이지, 장바구니 로그인회원정보 시작
+	public boolean updatePW(MemberBean mb) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		int updateAmount = 0;
+		try {
+			con = pool.getConnection();
+			sql = "update member set PW = ? where MEM_IDX = ?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, mb.getPassword());
+			pstmt.setInt(2, mb.getIdx());
+			updateAmount = pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+		return updateAmount > 0 ? true : false;
+	}
+	
 	public Vector<ProductBean> selectPro(String Cate, DefaultTableModel dtm) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
@@ -44,13 +67,13 @@ public class ShopMgr {
 		try {
 			con = pool.getConnection();
 			if (Cate != "전체") {
-				sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_name as 카테고리, p.price as 가격, p.inventory as 현재재고량, p.IMG_ADDRESS\n"
-						+ "FROM product p, category c " + "WHERE p.category_id = c.cat_idx AND c.cat_name = ?";
+				sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_name as 카테고리, p.price as 가격, p.inventory as 현재재고량, p.IMG_ADDRESS, c.cat_idx\n"
+						+ "FROM product p, category c " + "WHERE p.category_id = c.cat_idx AND c.cat_name = ? ORDER BY p.pro_idx";
 				pstmt = con.prepareStatement(sql);
 				pstmt.setString(1, Cate);
 			} else {
-				sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_name as 카테고리, p.price as 가격, p.inventory as 현재재고량, p.IMG_ADDRESS\n"
-						+ "FROM product p, category c " + "WHERE p.category_id = c.cat_idx";
+				sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_name as 카테고리, p.price as 가격, p.inventory as 현재재고량, p.IMG_ADDRESS, c.cat_idx\n"
+						+ "FROM product p, category c " + "WHERE p.category_id = c.cat_idx ORDER BY p.pro_idx";
 				pstmt = con.prepareStatement(sql);
 			}
 			ResultSet rs = pstmt.executeQuery();
@@ -63,7 +86,9 @@ public class ShopMgr {
 				data.add(rs.getInt(4));
 				data.add(rs.getInt(5));
 				pb.setProIdx(rs.getInt(1));
+				pb.setCateName(rs.getString(3));
 				pb.setImgAddress(rs.getString(6));
+				pb.setCateIdx(rs.getInt(7));
 				dtm.addRow(data);
 				pbv.add(pb);
 			}
@@ -75,7 +100,7 @@ public class ShopMgr {
 		return pbv;
 	}
 
-	public Vector<MainProductBean> selectPro(String Cate) {
+	public Vector<MainProductBean> selectPro(String Cate, int sortMode) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		String sql = null;
@@ -83,24 +108,66 @@ public class ShopMgr {
 		try {
 			con = pool.getConnection();
 			if (Cate != "전체") {
-				sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_idx as 카테고리번호,c.cat_name as 카테고리, p.price as 가격, p.IMG_ADDRESS\n"
-						+ "FROM product p, category c " + "WHERE p.category_id = c.cat_idx AND c.cat_name = ?";
+				switch (sortMode) {
+				case Constant.SORTPOPULARITY:
+					sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_idx as 카테고리번호, c.cat_name as 카테고리, p.price as 가격, p.IMG_ADDRESS\r\n"
+							+ "FROM product p\r\n"
+							+ "JOIN category c ON p.category_id = c.cat_idx AND c.cat_name = ?\r\n"
+							+ "LEFT JOIN order_log o ON p.pro_idx = o.pro_idx\r\n"
+							+ "GROUP BY p.pro_idx, p.name, c.cat_idx, c.cat_name, p.price, p.IMG_ADDRESS\r\n"
+							+ "ORDER BY COUNT(o.pro_idx) DESC";
+					break;
+				case Constant.SORTPRICEDESC:
+					sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_idx as 카테고리번호, c.cat_name as 카테고리, p.price as 가격, p.IMG_ADDRESS\r\n"
+							+ "FROM product p\r\n"
+							+ "JOIN category c ON p.category_id = c.cat_idx AND c.cat_name = ?\r\n"
+							+ "order by p.price desc";
+					break;
+				default:
+					sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_idx as 카테고리번호, c.cat_name as 카테고리, p.price as 가격, p.IMG_ADDRESS\r\n"
+							+ "FROM product p\r\n"
+							+ "JOIN category c ON p.category_id = c.cat_idx AND c.cat_name = ?\r\n"
+							+ "order by p.price";
+					break;
+				}
 				pstmt = con.prepareStatement(sql);
 				pstmt.setString(1, Cate);
 			} else {
-				sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_idx as 카테고리번호,c.cat_name as 카테고리, p.price as 가격, p.IMG_ADDRESS\n"
-						+ "FROM product p, category c " + "WHERE p.category_id = c.cat_idx";
+				switch (sortMode) {
+				case Constant.SORTPOPULARITY:
+					sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_idx as 카테고리번호, c.cat_name as 카테고리, p.price as 가격, p.IMG_ADDRESS\r\n"
+							+ "FROM product p\r\n"
+							+ "JOIN category c ON p.category_id = c.cat_idx\r\n"
+							+ "LEFT JOIN order_log o ON p.pro_idx = o.pro_idx\r\n"
+							+ "GROUP BY p.pro_idx, p.name, c.cat_idx, c.cat_name, p.price, p.IMG_ADDRESS\r\n"
+							+ "ORDER BY COUNT(o.pro_idx) DESC";
+					break;
+				case Constant.SORTPRICEDESC:
+					sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_idx as 카테고리번호, c.cat_name as 카테고리, p.price as 가격, p.IMG_ADDRESS\r\n"
+							+ "FROM product p\r\n"
+							+ "JOIN category c ON p.category_id = c.cat_idx\r\n"
+							+ "order by p.price desc";
+					break;
+				default:
+					sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_idx as 카테고리번호, c.cat_name as 카테고리, p.price as 가격, p.IMG_ADDRESS\r\n"
+							+ "FROM product p\r\n"
+							+ "JOIN category c ON p.category_id = c.cat_idx\r\n"
+							+ "order by p.price";
+					break;
+				}
 				pstmt = con.prepareStatement(sql);
 			}
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				MainProductBean mpb = new MainProductBean();
-				mpb.setProIdx(rs.getInt(1));
-				mpb.setProName(rs.getString(2));
-				mpb.setCategoryIdx(rs.getInt(3));
-				mpb.setCategoryName(rs.getString(4));
-				mpb.setPrice(rs.getInt(5));
-				mpb.setImgAddress(rs.getString(6));
+				ProductBean pb = new ProductBean();
+				pb.setProIdx(rs.getInt(1));
+				pb.setProName(rs.getString(2));
+				pb.setCateIdx(rs.getInt(3));
+				pb.setCateName(rs.getString(4));
+				pb.setPrice(rs.getInt(5));
+				pb.setImgAddress(rs.getString(6));
+				mpb.setPb(pb);
 				mpbv.add(mpb);
 			}
 		} catch (Exception e) {
@@ -111,27 +178,51 @@ public class ShopMgr {
 		return mpbv;
 	}
 
-	public Vector<MainProductBean> selectProBySearch(String word) {
+	public Vector<MainProductBean> selectProBySearch(String word, int sortMode) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		String sql = null;
 		Vector<MainProductBean> mpbv = new Vector<>();
 		try {
 			con = pool.getConnection();
-			sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_idx as 카테고리번호,c.cat_name as 카테고리, p.price as 가격, p.IMG_ADDRESS\r\n"
-					+ "from product p, category c\r\n"
-					+ "where replace(trim(p.name),' ','') like ? AND p.category_id = c.cat_idx";
+			switch (sortMode) {
+			case Constant.SORTPOPULARITY:
+				sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_idx as 카테고리번호, c.cat_name as 카테고리, p.price as 가격, p.IMG_ADDRESS\r\n"
+						+ "FROM product p\r\n"
+						+ "JOIN category c ON p.category_id = c.cat_idx AND replace(trim(p.name),' ','') like ?\r\n"
+						+ "LEFT JOIN order_log o ON p.pro_idx = o.pro_idx\r\n"
+						+ "GROUP BY p.pro_idx, p.name, c.cat_idx, c.cat_name, p.price, p.IMG_ADDRESS\r\n"
+						+ "ORDER BY COUNT(o.pro_idx) DESC";
+				break;
+			case Constant.SORTPRICEDESC:
+				sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_idx as 카테고리번호, c.cat_name as 카테고리, p.price as 가격, p.IMG_ADDRESS\r\n"
+						+ "FROM product p\r\n"
+						+ "JOIN category c ON p.category_id = c.cat_idx AND replace(trim(p.name),' ','') like ?\r\n"
+						+ "order by p.price desc";
+				break;
+			default:
+				sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_idx as 카테고리번호, c.cat_name as 카테고리, p.price as 가격, p.IMG_ADDRESS\r\n"
+						+ "FROM product p\r\n"
+						+ "JOIN category c ON p.category_id = c.cat_idx AND replace(trim(p.name),' ','') like ?\r\n"
+						+ "order by p.price";
+				break;
+			}
+//			sql = "SELECT p.pro_idx as 상품번호, p.name as 상품명, c.cat_idx as 카테고리번호,c.cat_name as 카테고리, p.price as 가격, p.IMG_ADDRESS\r\n"
+//					+ "from product p, category c\r\n"
+//					+ "where replace(trim(p.name),' ','') like ? AND p.category_id = c.cat_idx";
 			pstmt = con.prepareStatement(sql);
 			pstmt.setString(1, "%" + word + "%");
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				MainProductBean mpb = new MainProductBean();
-				mpb.setProIdx(rs.getInt(1));
-				mpb.setProName(rs.getString(2));
-				mpb.setCategoryIdx(rs.getInt(3));
-				mpb.setCategoryName(rs.getString(4));
-				mpb.setPrice(rs.getInt(5));
-				mpb.setImgAddress(rs.getString(6));
+				ProductBean pb = new ProductBean();
+				pb.setProIdx(rs.getInt(1));
+				pb.setProName(rs.getString(2));
+				pb.setCateIdx(rs.getInt(3));
+				pb.setCateName(rs.getString(4));
+				pb.setPrice(rs.getInt(5));
+				pb.setImgAddress(rs.getString(6));
+				mpb.setPb(pb);
 				mpbv.add(mpb);
 			}
 		} catch (Exception e) {
@@ -183,7 +274,7 @@ public class ShopMgr {
 		return updateAmount > 0 ? true : false;
 	}
 
-	public boolean deletePro(int idx) {
+	public boolean deletePro(ProductBean pb) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		String sql = null;
@@ -192,8 +283,26 @@ public class ShopMgr {
 			con = pool.getConnection();
 			sql = "delete from PRODUCT where PRO_IDX = ?";
 			pstmt = con.prepareStatement(sql);
-			pstmt.setInt(1, idx);
+			pstmt.setInt(1, pb.getProIdx());
 			updateAmount = pstmt.executeUpdate();
+			
+			sql = "select count(*)\r\n"
+					+ "from product\r\n"
+					+ "where category_id = ?\r\n"
+					+ "group by category_id";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, pb.getCateIdx());
+			ResultSet rs = pstmt.executeQuery();
+			if (!rs.next()) {
+				sql = "delete from category where cat_idx = ?";
+				pstmt = con.prepareStatement(sql);
+				pstmt.setInt(1, pb.getCateIdx());
+				int cnt = pstmt.executeUpdate();
+				if (cnt > 0) {
+					Admin_AddInventory aa = Admin_AddInventory.getinstance();
+					JOptionPane.showMessageDialog(aa, pb.getCateName()+" 카테고리의 상품이 없어 해당 카테고리를 삭제합니다.");
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -472,7 +581,7 @@ public class ShopMgr {
 		return returnStr;
 	}
 
-	public HashMap<Integer, CartBean> selectCart(int memIdx) {
+	public HashMap<Integer, CartBean> selectCart(int memIdx, int mode) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		String sql = null;
@@ -482,9 +591,10 @@ public class ShopMgr {
 			con = pool.getConnection();
 			sql = "select p.pro_idx as proIdx, p.name as name, o.quantity as quantity, p.price as price\r\n"
 					+ "from order_log o, product p\r\n"
-					+ "where p.pro_idx = o.pro_idx and o.mem_idx = ? and status = 0";
+					+ "where p.pro_idx = o.pro_idx and o.mem_idx = ? and status = ?";
 			pstmt = con.prepareStatement(sql);
 			pstmt.setInt(1, memIdx);
+			pstmt.setInt(2, mode);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				CartBean cb = new CartBean();
@@ -508,6 +618,97 @@ public class ShopMgr {
 		}
 		return cartHm;
 	}
+	
+	public Vector<OrderLogBean> selectOrderLog(int memIdx) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		Vector<OrderLogBean> olv = new Vector<>();
+		try {
+			con = pool.getConnection();
+			sql = "select p.pro_idx as proIdx, p.name as name, o.quantity as quantity, p.price as price, p.img_address, o.init_date, o.final_date, o.status\r\n"
+					+ "from order_log o, product p\r\n"
+					+ "where p.pro_idx = o.pro_idx and o.mem_idx = ? and status != 0 And status != 2 order by o.init_date DESC";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, memIdx);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				OrderLogBean olb = new OrderLogBean();
+				olb.getPb().setProIdx(rs.getInt(1));
+				olb.getPb().setProName(rs.getString(2));
+				olb.setQuantity(rs.getInt(3));
+				olb.getPb()	.setPrice(rs.getInt(4));
+				olb.getPb().setImgAddress(rs.getString(5));
+				olb.setOrderTimeStamp(rs.getString(6));
+				olb.setFinalTimeStamp(rs.getString(7));
+				olb.setStatus(rs.getInt(8));
+				olv.add(olb);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+		return olv;
+	}
+	
+	public Vector<OrderLogBean> selectOrderLog2() {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		Vector<OrderLogBean> olv = new Vector<>();
+		try {
+			con = pool.getConnection();
+			sql = "select p.pro_idx as proIdx, p.name as name, o.quantity as quantity, p.price as price, p.img_address, o.init_date, o.final_date, o.status, m.Name, m.mem_idx\r\n"
+					+ "from order_log o, product p, member m\r\n"
+					+ "where p.pro_idx = o.pro_idx and o.status = 1 and m.mem_idx = o.mem_idx order by o.init_date DESC";
+			pstmt = con.prepareStatement(sql);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				OrderLogBean olb = new OrderLogBean();
+				olb.getPb().setProIdx(rs.getInt(1));
+				olb.getPb().setProName(rs.getString(2));
+				olb.setQuantity(rs.getInt(3));
+				olb.getPb()	.setPrice(rs.getInt(4));
+				olb.getPb().setImgAddress(rs.getString(5));
+				olb.setOrderTimeStamp(rs.getString(6));
+				olb.setFinalTimeStamp(rs.getString(7));
+				olb.setStatus(rs.getInt(8));
+				olb.setMemName(rs.getString(9));
+				olb.setMemIdx(rs.getInt(10));
+				olv.add(olb);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+		return olv;
+	}
+	
+	public boolean updateOrderLog(OrderLogBean olb, int oldMode, int newMode) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		int updateAmount = 0;
+		System.out.println(olb.getMemIdx() +"/" + olb.getPb().getProIdx() + "/" + olb.getStatus());
+		Vector<OrderLogBean> olv = new Vector<>();
+		try {
+			con = pool.getConnection();
+			sql = "update order_log set status = ?, final_date = SYSDATE where mem_idx = ? And pro_idx = ? And status = ?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, newMode);
+			pstmt.setInt(2, olb.getMemIdx());
+			pstmt.setInt(3, olb.getPb().getProIdx());
+			pstmt.setInt(4, oldMode);
+			updateAmount = pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+		return updateAmount > 0 ? true : false;
+	}
 
 	public boolean updateCartFromPro(CartBean cb, int status) {
 		Connection con = null;
@@ -516,19 +717,21 @@ public class ShopMgr {
 		int updateAmount = 0;
 		try {
 			con = pool.getConnection();
-			if (status == 1) {
+			if (status == Constant.CARTORDERCOMPLETE) {
 				con.setAutoCommit(false);
-				sql = "update order_log set status = ?, Final_date = SYSDATE where PRO_IDX = ? AND MEM_IDX = ? AND STATUS = 0";
+				sql = "update order_log set status = ?, Final_date = SYSDATE, Quantity = ? where PRO_IDX = ? AND MEM_IDX = ? AND STATUS = 0";
 				pstmt = con.prepareStatement(sql);
 				pstmt.setInt(1, status);
-				pstmt.setInt(2, cb.getProIdx());
-				pstmt.setInt(3, cb.getMemIdx());
+				pstmt.setInt(2, cb.getQuantity());
+				pstmt.setInt(3, cb.getProIdx());
+				pstmt.setInt(4, cb.getMemIdx());
 				updateAmount = pstmt.executeUpdate();
 				sql = "update product set inventory = inventory - ? where PRO_IDX = ?";
 				pstmt = con.prepareStatement(sql);
 				pstmt.setInt(1, cb.getQuantity());
 				pstmt.setInt(2, cb.getProIdx());
 				updateAmount = pstmt.executeUpdate();
+				System.out.println(cb.getProIdx() + "/" + cb.getQuantity());
 				con.commit();
 				con.setAutoCommit(true);
 			} else {
@@ -546,7 +749,54 @@ public class ShopMgr {
 		}
 		return updateAmount > 0 ? true : false;
 	}
-	
+
+	public int insertShopCart(CartBean cb, int status) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		int updateAmount = 0;
+		try {
+			con = pool.getConnection();
+			sql = "select quantity\r\n" + "from order_log\r\n" + "where pro_idx = ? AND mem_idx = ? AND status = 0";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, cb.getProIdx());
+			pstmt.setInt(2, cb.getMemIdx());
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) {
+				productInfo pi = productInfo.getInstance();
+				int answer = JOptionPane.showConfirmDialog(pi,
+						"장바구니에 이미 존재하는 상품입니다. 그래도 추가하시겠습니까?\n(예를 누르시면 장바구니에 있는 해당 상품의 수량에 1이 추가됩니다.)", "안내",
+						JOptionPane.YES_NO_OPTION);
+				if (answer == JOptionPane.YES_OPTION) {
+					sql = "UPDATE order_log\r\n" + "    SET QUANTITY = QUANTITY + ?,\r\n"
+							+ "        final_date = SYSDATE\r\n" + "    WHERE pro_idx = ?\r\n"
+							+ "      AND mem_idx = ?\r\n" + "      AND status = 0";
+					pstmt = con.prepareStatement(sql);
+					pstmt.setInt(2, cb.getProIdx());
+					pstmt.setInt(3, cb.getMemIdx());
+					pstmt.setInt(1, cb.getQuantity());
+					updateAmount = pstmt.executeUpdate();
+				} else {
+					return -1;
+				}
+			} else {
+				sql = "INSERT INTO ORDER_LOG VALUES (?,?,SYSDATE,?,SYSDATE,?,SYSDATE)";
+				pstmt = con.prepareStatement(sql);
+				pstmt.setInt(1, cb.getProIdx());
+				pstmt.setInt(2, cb.getMemIdx());
+				pstmt.setInt(3, cb.getQuantity());
+				pstmt.setInt(4, status);
+				updateAmount = pstmt.executeUpdate();
+				System.out.println("인서트");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+		return updateAmount;
+	}
+
 	public MemberBean selectMember(String id, String pw) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
@@ -554,9 +804,7 @@ public class ShopMgr {
 		MemberBean mb = new MemberBean();
 		try {
 			con = pool.getConnection();
-			sql = "select *\r\n"
-					+ "from member\r\n"
-					+ "where id = ? AND pw = ?";
+			sql = "select *\r\n" + "from member\r\n" + "where id = ? AND pw = ?";
 			pstmt = con.prepareStatement(sql);
 			pstmt.setString(1, id);
 			pstmt.setString(2, pw);
@@ -584,11 +832,25 @@ public class ShopMgr {
 
 	// 강성웅-리뷰
 
-	public List<starDto> getStarDtoLists(int proIdx) throws SQLException {
+	public Vector<ReviewBean> selectReview(int proIdx, int mode) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
-		String sql = "SELECT * FROM shop.REVIEW WHERE PRO_IDX = ?";
-		List<starDto> starDtoList = new ArrayList<>();
+		String sql = new String();
+		switch (mode) {
+		case Constant.REVIEWLATEST:
+			sql = "select r.pro_idx, r.mem_idx, m.name, r.com_date, r.comments, r.star_rating\r\n"
+					+ "from review r, member m\r\n" + "where r.pro_idx = ? AND r.mem_idx = m.mem_idx order by com_date desc";
+			break;
+		case Constant.REVIEWHIGHSTARRATE:
+			sql = "select r.pro_idx, r.mem_idx, m.name, r.com_date, r.comments, r.star_rating\r\n"
+					+ "from review r, member m\r\n" + "where r.pro_idx = ? AND r.mem_idx = m.mem_idx order by star_Rating desc";
+			break;
+		default:
+			sql = "select r.pro_idx, r.mem_idx, m.name, r.com_date, r.comments, r.star_rating\r\n"
+					+ "from review r, member m\r\n" + "where r.pro_idx = ? AND r.mem_idx = m.mem_idx order by star_Rating";
+			break;
+		}
+		Vector<ReviewBean> rbv = new Vector<>();
 
 		try {
 			con = pool.getConnection();
@@ -597,9 +859,14 @@ public class ShopMgr {
 			ResultSet rs = pstmt.executeQuery();
 
 			while (rs.next()) {
-				starDto tempStarDto = new starDto(rs.getInt("PRO_IDX"), rs.getInt("MEM_IDX"),
-						rs.getTimestamp("COM_DATE"), rs.getString("COMMENTS"), rs.getInt("STAR_RATING"));
-				starDtoList.add(tempStarDto);
+				ReviewBean bean = new ReviewBean();
+				bean.setProIdx(rs.getInt(1));
+				bean.setMemIdx(rs.getInt(2));
+				bean.setMemName(rs.getString(3));
+				bean.setComTimeStamp(rs.getString(4));
+				bean.setComments(rs.getString(5));
+				bean.setStarRating(rs.getInt(6));
+				rbv.add(bean);
 			}
 
 		} catch (Exception e) {
@@ -608,23 +875,48 @@ public class ShopMgr {
 			pool.freeConnection(con, pstmt);
 		}
 
-		return starDtoList;
+		return rbv;
+	}
+	
+	public boolean isPurchased(int memIdx, int proIdx) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = "select * from order_log where pro_idx = ? And mem_idx = ? AND status != 0 AND status != 2";
+		boolean flag = false;
+		try {
+			con = pool.getConnection();
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, proIdx);
+			pstmt.setInt(2, memIdx);
+			ResultSet rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				flag  = true;
+			} else {
+				flag = false;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+
+		return flag;
 	}
 
-	public boolean deleteStarCustomer(int proIdx, int memIdx, Timestamp comDate, String comments, int starRating) {
+	public boolean deleteReview(ReviewBean bean) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		String sql = null;
 		int updateAmount = 0;
 		try {
 			con = pool.getConnection();
-			sql = "DELETE FROM shop.REVIEW WHERE PRO_IDX = ? AND MEM_IDX = ? AND COM_DATE = ? AND COMMENTS = ? AND STAR_RATING = ?";
+			sql = "DELETE FROM shop.REVIEW WHERE PRO_IDX = ? AND MEM_IDX = ? AND COM_DATE = to_timestamp(?)";
 			pstmt = con.prepareStatement(sql);
-			pstmt.setInt(1, proIdx);
-			pstmt.setInt(2, memIdx);
-			pstmt.setTimestamp(3, comDate);
-			pstmt.setString(4, comments);
-			pstmt.setInt(5, starRating);
+			pstmt.setInt(1, bean.getProIdx());
+			pstmt.setInt(2, bean.getMemIdx());
+			pstmt.setString(3, bean.getComTimeStamp());
 			updateAmount = pstmt.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -634,51 +926,49 @@ public class ShopMgr {
 		return updateAmount > 0 ? true : false;
 	}
 
-//	       Insert into SHOP.MEMBER (MEM_IDX,ID,PW,NAME,GRADE,POINT,JOIN_DATE,TYPE) 
-//	     values (2,'aaaa','1234','홍길동','Bronze',0,to_date('23/02/14','RR/MM/DD'),'일반');
-
-	public boolean updateCustomer(String id, String pw, String nam) throws Exception {
+	public boolean insertReview(ReviewBean bean) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
-		ResultSet rs = null;
 		String sql = null;
 		int updateAmount = 0;
 		try {
 			con = pool.getConnection();
-			// 중복되지 않는 가장 작은 MEM_IDX 값 찾기
-			sql = "SELECT MEM_IDX FROM MEMBER";
+			sql = "INSERT INTO REVIEW VALUES (?,?,SYSDATE,?,?)";
 			pstmt = con.prepareStatement(sql);
-			rs = pstmt.executeQuery();
-			List<Integer> memIdxList = new ArrayList<>(); // MEM_IDX 값을 저장할 리스트
-			while (rs.next()) {
-				memIdxList.add(rs.getInt("MEM_IDX"));
-
-			}
-
-			System.out.println(memIdxList);
-			int memIdx = 1;
-			while (memIdxList.contains(memIdx)) { // MEM_IDX 값 중복 처리
-				memIdx++;
-			}
-
-			// INSERT 쿼리 실행
-			sql = "INSERT INTO shop.MEMBER(MEM_IDX, ID, PW, NAME, GRADE, POINT, JOIN_DATE, TYPE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-			pstmt = con.prepareStatement(sql);
-			pstmt.setInt(1, memIdx);
-			pstmt.setString(2, id);
-			pstmt.setString(3, pw);
-			pstmt.setString(4, nam);
-			pstmt.setString(5, "Bronze");
-			pstmt.setInt(6, 0);
-			pstmt.setDate(7, new Date(System.currentTimeMillis()));
-			pstmt.setString(8, "일반");
+			pstmt.setInt(1, bean.getProIdx());
+			pstmt.setInt(2, bean.getMemIdx());
+			pstmt.setString(3, bean.getComments());
+			pstmt.setInt(4, bean.getStarRating());
 			updateAmount = pstmt.executeUpdate();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			pool.freeConnection(con, pstmt, rs);
+			pool.freeConnection(con, pstmt);
 		}
-		return updateAmount > 0;
+		return updateAmount > 0 ? true : false;
+	}
+
+	public boolean updateReview(ReviewBean bean) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		int updateAmount = 0;
+		try {
+			con = pool.getConnection();
+			sql = "UPDATE REVIEW SET comments = ? , star_rating = ?, com_date = SYSDATE WHERE pro_idx = ? AND mem_idx = ? AND com_date = to_timestamp(?)";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, "(수정됨)" + bean.getComments());
+			pstmt.setInt(2, bean.getStarRating());
+			pstmt.setInt(3, bean.getProIdx());
+			pstmt.setInt(4, bean.getMemIdx());
+			pstmt.setString(5, bean.getComTimeStamp());
+			updateAmount = pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+		return updateAmount > 0 ? true : false;
 	}
 
 	// 강성웅-리뷰
@@ -721,151 +1011,148 @@ public class ShopMgr {
 	}
 
 	// 박수근 - 회원가입 끝
-	
+
 	// 서수정 시작
 	// 로그인
-		public boolean login(String id, String password) {
-			Connection con = null;
-			PreparedStatement pstmt = null;
-			String sql = null;
-			boolean flag = false;
-			try {
-				con = pool.getConnection();
-				sql = "select pw\r\n" + "from member\r\n" + "where id = ?";
-				pstmt = con.prepareStatement(sql);
-				pstmt.setString(1, id);
-				ResultSet rs = pstmt.executeQuery();
-				if (rs.next()) {
-					if (rs.getString(1).equals(password))
-						return true; // 로그인 성공
-					else {
-						return false; // 로그인 실패
-					}
+	public boolean login(String id, String password) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		boolean flag = false;
+		try {
+			con = pool.getConnection();
+			sql = "select pw\r\n" + "from member\r\n" + "where id = ?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, id);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) {
+				if (rs.getString(1).equals(password))
+					return true; // 로그인 성공
+				else {
+					return false; // 로그인 실패
 				}
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				pool.freeConnection(con, pstmt);
 			}
-			return flag;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
 		}
+		return flag;
+	}
 
-		// 새상품 추가
+	// 새상품 추가
 
-		public ProductBean addProduct(ProductBean pb) {
+	public ProductBean addProduct(ProductBean pb) {
 
-			Connection con = null;
-			PreparedStatement pstmt = null;
-			String sql = null;
-			ResultSet rs = null;
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		ResultSet rs = null;
 
-			try {
+		try {
 
-				con = pool.getConnection();
-				con.setAutoCommit(false);
-				sql = "insert into product values(seq_pro.nextval,?,?,?,?,?)";
-				pstmt = con.prepareStatement(sql);
+			con = pool.getConnection();
+			con.setAutoCommit(false);
+			sql = "insert into product values(seq_pro.nextval,?,?,?,?,?)";
+			pstmt = con.prepareStatement(sql);
 
-				pstmt.setString(1, pb.getProName());
-				pstmt.setInt(2, pb.getCateIdx());
-				pstmt.setInt(3, pb.getPrice());
-				pstmt.setString(4, pb.getImgAddress());
-				pstmt.setInt(5, pb.getInventory());
+			pstmt.setString(1, pb.getProName());
+			pstmt.setInt(2, pb.getCateIdx());
+			pstmt.setInt(3, pb.getPrice());
+			pstmt.setString(4, pb.getImgAddress());
+			pstmt.setInt(5, pb.getInventory());
 
-				int cnt = pstmt.executeUpdate();
+			int cnt = pstmt.executeUpdate();
 
-				sql = "select LAST_NUMBER-1 from USER_SEQUENCES where SEQUENCE_NAME = 'SEQ_PRO' ";
-				pstmt = con.prepareStatement(sql);
-				rs = pstmt.executeQuery();
-				while (rs.next()) {
+			sql = "select LAST_NUMBER-1 from USER_SEQUENCES where SEQUENCE_NAME = 'SEQ_PRO' ";
+			pstmt = con.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
 
-					pb.setProIdx(rs.getInt(1));
+				pb.setProIdx(rs.getInt(1));
 
-				}
-				sql = "update product set img_address = ? where pro_idx = ? ";
-				pstmt = con.prepareStatement(sql);
+			}
+			sql = "update product set img_address = ? where pro_idx = ? ";
+			pstmt = con.prepareStatement(sql);
 
-				String imgAddress = "./img\\\\product" + pb.getProIdx() + ".png";
-				System.out.println(imgAddress);
-				pstmt.setString(1, imgAddress);
-				pstmt.setInt(2, pb.getProIdx());
+			String imgAddress = "./img\\\\product" + pb.getProIdx() + ".png";
+			System.out.println(imgAddress);
+			pstmt.setString(1, imgAddress);
+			pstmt.setInt(2, pb.getProIdx());
 
-				cnt = pstmt.executeUpdate();
+			cnt = pstmt.executeUpdate();
 
-				con.commit();
+			con.commit();
 
-			} catch (Exception e) {
-				e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 //				JOptionPane.showMessageDialog(null, (String)e.getMessage(), "11",JOptionPane.PLAIN_MESSAGE);
-				pb.setProIdx(-1);
-			} finally {
-				pool.freeConnection(con, pstmt); // 리소스 반환
-			}
-
-			return pb;
+			pb.setProIdx(-1);
+		} finally {
+			pool.freeConnection(con, pstmt); // 리소스 반환
 		}
 
-		// 카테고리 추가
-		public boolean addCate(String addCate) {
-			Connection con = null;
-			PreparedStatement pstmt = null;
-			String sql = null;
-			boolean flag = false;
-			try {
-				con = pool.getConnection();
-				
-				sql = "insert into category values(seq_cat.nextval,?)";
-				pstmt = con.prepareStatement(sql);
-				pstmt.setString(1, addCate);
-				int cnt = pstmt.executeUpdate();
-				if (cnt == 1) {
-					flag = true; // 카테고리 추가 성공
-				} else {
-					flag = false; // 카테고리 추가 실패
-				}
-				System.out.println(flag);
+		return pb;
+	}
 
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				pool.freeConnection(con, pstmt);
+	// 카테고리 추가
+	public boolean addCate(String addCate) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		boolean flag = false;
+		try {
+			con = pool.getConnection();
+
+			sql = "insert into category values(seq_cat.nextval,?)";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, addCate);
+			int cnt = pstmt.executeUpdate();
+			if (cnt == 1) {
+				flag = true; // 카테고리 추가 성공
+			} else {
+				flag = false; // 카테고리 추가 실패
 			}
-			return flag;
+			System.out.println(flag);
 
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
 		}
-		
-		// 카테고리 콤보박스 리스트
-		public void comboList( DefaultComboBoxModel<String> cateList ) {
-			Connection con = null;
-			PreparedStatement pstmt = null;
-			String sql = null;
-			ResultSet rs = null;
-			
-			
-			try {
-				
-				con = pool.getConnection();
-				sql = "select cat_name from category";
-				pstmt = con.prepareStatement(sql);
-				rs = pstmt.executeQuery();
-				cateList.removeAllElements();
-				while (rs.next()) {
-					
-					
-					cateList.addElement(rs.getString(1));
-					
+		return flag;
 
-				}
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-			}finally {
-				pool.freeConnection(con, pstmt);
+	}
+
+	// 카테고리 콤보박스 리스트
+	public Vector<Integer> comboList(DefaultComboBoxModel<String> cateList) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		ResultSet rs = null;
+		Vector<Integer> cateIdx = new Vector<>();
+
+		try {
+
+			con = pool.getConnection();
+			sql = "select cat_name, cat_idx from category";
+			pstmt = con.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			cateList.removeAllElements();
+			while (rs.next()) {
+				cateList.addElement(rs.getString(1));
+				cateIdx.add(rs.getInt(2));
 			}
-			
-			
-			
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
 		}
+
+		return cateIdx;
+
+	}
 	// 서수정 끝
 }
