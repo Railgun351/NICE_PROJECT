@@ -6,15 +6,16 @@ import javax.swing.JSpinner;
 public class CartBean {
 	private int proIdx;
 	private String proName;
-	private int memIdx;
+	private MemberBean mb;
 	private int quantity;
 	private int proPrice;
+	private int payment;
 	private JSpinner jsp;
 	private JButton btn;
 	
 	public CartBean() {
 		proIdx = -1;
-		memIdx = -1;
+		mb = new MemberBean();
 		quantity = -1;
 	}
 	
@@ -24,14 +25,6 @@ public class CartBean {
 
 	public void setProIdx(int proIdx) {
 		this.proIdx = proIdx;
-	}
-
-	public int getMemIdx() {
-		return memIdx;
-	}
-
-	public void setMemIdx(int memIdx) {
-		this.memIdx = memIdx;
 	}
 
 	public int getQuantity() {
@@ -72,6 +65,22 @@ public class CartBean {
 
 	public void setBtn(JButton btn) {
 		this.btn = btn;
+	}
+
+	public int getPayment() {
+		return payment;
+	}
+
+	public void setPayment(int payment) {
+		this.payment = payment;
+	}
+
+	public MemberBean getMb() {
+		return mb;
+	}
+
+	public void setMb(MemberBean mb) {
+		this.mb = mb;
 	}
 	
 }

@@ -46,14 +46,14 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import javax.swing.DefaultComboBoxModel;
 
-public class productInfo extends JFrame implements ActionListener, Runnable{
+public class productInfo extends JFrame implements ActionListener, Runnable {
 
 	private static productInfo pi;
 	private JPanel contentPane;
 	private CustomMethod cm = new CustomMethod();
 	private ShopMgr sm = ShopMgr.getInstance();
 	private MemberBean mb;
-	private ProductBean pb;
+	public ProductBean pb;
 	private JLabel lbProName;
 	private JLabel lbPrice;
 	private JLabel lbProImg;
@@ -90,48 +90,55 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 	public static productInfo getInstance() {
 		if (pi == null) {
 			pi = new productInfo(new ProductBean(), new MemberBean());
-		} return pi;
+		}
+		return pi;
 	}
-	
+
 	public void refresh(ProductBean pb, MemberBean mb) {
 		this.pb = pb;
 		this.mb = mb;
 		lbProName.setText(this.pb.getProName());
-		lbPrice.setText(cm.toWon(this.pb.getPrice())+"    ");
+		lbPrice.setText(cm.toWon(this.pb.getPrice()) + "    ");
 		lbProImg.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\product" + pb.getProIdx() + ".png"), 300, 300));
-		lbPopUpName.setText(mb.getName()+"님");
-		lbPopUpGrade.setText("등급 : "+mb.getGrade());
-		lbPopUpPoint.setText("포인트 : "+mb.getPoint());
-		setTitle("NICE 제품 상세 페이지 - "+mb.getName()+"님");
+		lbPopUpName.setText(mb.getName() + "님");
+		lbPopUpGrade.setText("등급 : " + mb.getGrade());
+		lbPopUpPoint.setText("포인트 : " + mb.getPoint());
+		setTitle("NICE 제품 상세 페이지 - " + mb.getName() + "님");
 		comboBox.setSelectedIndex(0);
+		if (sm.updateMember(mb)) {
+			System.out.println("회원정보업데이트");
+		} else {
+			System.out.println("회원정보업데이트 실패");
+		}
+		addData();
 	}
-	
+
 	/**
 	 * Create the frame.
 	 */
 	private productInfo(ProductBean pb, MemberBean mb) {
 		this.pb = pb;
 		this.mb = mb;
-		setTitle("NICE 제품 상세 페이지 - "+mb.getName()+"님");
+		setTitle("NICE 제품 상세 페이지 - " + mb.getName() + "님");
 		setIconImage(Toolkit.getDefaultToolkit().getImage("./IMG\\LogoIcon.png"));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 542, 832);
 		setLocationRelativeTo(null);
-		
+
 		contentPane = new JPanel();
 		contentPane.setBackground(new Color(255, 255, 255));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
+
 		panelPopUp = new JPanel();
-		panelPopUp.setBounds(524, 0, 150, 210);
-		panelPopUp.setBackground(new Color(200,200,200,240));
-		
+		panelPopUp.setBounds(524, 0, 150, 800);
+		panelPopUp.setBackground(new Color(200, 200, 200, 240));
+
 		contentPane.add(panelPopUp);
 		panelPopUp.setLayout(null);
-		
+
 		btnClosePopUp = new JButton("");
 		btnClosePopUp.setContentAreaFilled(false);
 		btnClosePopUp.setBorderPainted(false);
@@ -142,6 +149,7 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 			public void mouseEntered(MouseEvent e) {
 				btnClosePopUp.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\XFill.png"), 30, 30));
 			}
+
 			@Override
 			public void mouseExited(MouseEvent e) {
 				btnClosePopUp.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\XNull.png"), 30, 30));
@@ -155,27 +163,27 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 			}
 		});
 		panelPopUp.add(btnClosePopUp);
-		
+
 		lbPopUpName = new JLabel("New label");
 		lbPopUpName.setFont(new Font("맑은 고딕", Font.BOLD, 20));
 		lbPopUpName.setBounds(12, 44, 126, 30);
 		panelPopUp.add(lbPopUpName);
-		
+
 		lbPopUpGrade = new JLabel("New label");
 		lbPopUpGrade.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
 		lbPopUpGrade.setBounds(12, 84, 126, 30);
 		panelPopUp.add(lbPopUpGrade);
-		
+
 		lbPopUpPoint = new JLabel("New label");
 		lbPopUpPoint.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
 		lbPopUpPoint.setBounds(12, 124, 126, 30);
 		panelPopUp.add(lbPopUpPoint);
-		
+
 		btnMyPage = new JButton("마이페이지");
 		btnMyPage.setContentAreaFilled(false);
 		btnMyPage.setBounds(12, 164, 126, 30);
 		btnMyPage.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				MyPage myp = MyPage.getInstance();
@@ -187,7 +195,7 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 			}
 		});
 		panelPopUp.add(btnMyPage);
-		
+
 		noData = new JLabel("<html><body><center>작성된 후기가 없습니다.<br>첫 후기를 작성해보세요!</center></body></html>");
 		noData.setFont(new Font("맑은 고딕", Font.BOLD, 18));
 		noData.setOpaque(true);
@@ -202,21 +210,61 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				CartBean cb = new CartBean();
-				cb.setMemIdx(pi.mb.getIdx());
+				cb.getMb().setIdx(pi.mb.getIdx());
+				cb.getMb().setPoint(pi.mb.getPoint());
 				cb.setProIdx(pi.pb.getProIdx());
 				cb.setProName(pi.pb.getProName());
 				cb.setProPrice(pi.pb.getPrice());
 				cb.setQuantity(1);
-				int answer = JOptionPane.showConfirmDialog(pi, pi.pb.getProName()+" 상품(1개)를 즉시 구매합니다.\n결제 금액 : "+cm.toWon(pi.pb.getPrice()),"안내",JOptionPane.YES_NO_OPTION);
+				cb.setPayment(cb.getProPrice() * cb.getQuantity());
+				int answer = JOptionPane.showConfirmDialog(pi,
+						pi.pb.getProName() + " 상품(1개)를 즉시 구매합니다.\n결제 금액 : " + cm.toWon(pi.pb.getPrice()), "안내",
+						JOptionPane.YES_NO_OPTION);
 				if (answer == JOptionPane.YES_OPTION) {
-					if (sm.insertShopCart(cb, Constant.CARTORDERCOMPLETE) > 0) {
-						JOptionPane.showMessageDialog(pi, "결제 및 상품주문이 완료되었습니다.");
+					if (cb.getMb().getPoint() > 0
+							&& JOptionPane.showConfirmDialog(pi, cb.getMb().getPoint() + " 포인트가 있습니다. 사용하시겠습니까?", "안내",
+									JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+						if (cb.getMb().getPoint() >= cb.getPayment()) {
+							int sub = cb.getMb().getPoint() - cb.getPayment();
+							cb.getMb().setPoint(sub);
+							pi.mb.setPoint(sub);
+							cb.setPayment(0);
+						} else {
+							int sub = cb.getPayment() - cb.getMb().getPoint();
+							cb.getMb().setPoint(0);
+							pi.mb.setPoint(0);
+							cb.setPayment(sub);
+						}
+						if (sm.insertShopCart(cb, Constant.CARTORDERCOMPLETE) > 0) {
+							JOptionPane.showMessageDialog(pi, "포인트를 사용하여 결제 및 상품주문이 완료되었습니다.\n결제 금액 : "+cm.toWon(cb.getPayment())+"/잔여 포인트 : "+cb.getMb().getPoint());
+						} else {
+							JOptionPane.showMessageDialog(pi, "결제 중 문제가 발생했습니다.\n잠시 후 시도해 주세요");
+						}
 					} else {
-						JOptionPane.showMessageDialog(pi, "결제 중 문제가 발생했습니다.\n잠시 후 시도해 주세요");
+						long temp = 0;
+						if (pi.mb.getGrade().equals(Constant.BRONZE)) {
+							temp = (long) (cb.getPayment()*(Constant.BRONZEPERPOINT));
+						} else if (pi.mb.getGrade().equals(Constant.SILVER)) {
+							temp = (long) (cb.getPayment()*(Constant.SILVERPERPOINT));
+						} else if (pi.mb.getGrade().equals(Constant.GOLD)) {
+							temp = (long) (cb.getPayment()*(Constant.GOLDPERPOINT));
+						} else if (pi.mb.getGrade().equals(Constant.PLATINUM)) {
+							temp = (long) (cb.getPayment()*(Constant.PLATINUMPERPOINT));
+						} else if (pi.mb.getGrade().equals(Constant.DIAMOND)) {
+							temp = (long) (cb.getPayment()*(Constant.DIAMONDPERPOINT));
+						}
+						pi.mb.setPoint(pi.mb.getPoint() + (int)temp);
+						if (sm.insertShopCart(cb, Constant.CARTORDERCOMPLETE) > 0 && sm.updateMember(pi.mb)) {
+							JOptionPane.showMessageDialog(pi, "결제 및 상품주문이 완료되었습니다.\n"+(int)temp+" 포인트 적립");
+						} else {
+							JOptionPane.showMessageDialog(pi, "결제 중 문제가 발생했습니다.\n잠시 후 시도해 주세요");
+							pi.mb.setPoint(pi.mb.getPoint() - (int)temp);
+						}
 					}
 				} else {
-					JOptionPane.showMessageDialog(pi, "결제를 취소했습니다.","안내",JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(pi, "결제를 취소했습니다.", "안내", JOptionPane.INFORMATION_MESSAGE);
 				}
+				gradeCheck(pi.mb);
 			}
 		});
 		contentPane.add(btnImPur);
@@ -229,18 +277,20 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				CartBean cb = new CartBean();
-				cb.setMemIdx(pi.mb.getIdx());
+				cb.getMb().setIdx(pi.mb.getIdx());
 				cb.setProIdx(pi.pb.getProIdx());
 				cb.setProName(pi.pb.getProName());
 				cb.setProPrice(pi.pb.getPrice());
 				cb.setQuantity(1);
+				cb.setPayment(cb.getProPrice()*cb.getQuantity());
 				int result = sm.insertShopCart(cb, Constant.CARTORDER);
 				if (result > 0) {
-					JOptionPane.showMessageDialog(pi, "해당 상품을 장바구니에 추가하였습니다.","안내",JOptionPane.INFORMATION_MESSAGE);
-				} else if (result  == 0){
-					JOptionPane.showMessageDialog(pi, "장바구니에 추가하지 못했습니다.\n잠시 후에 다시 시도해주세요.","안내",JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(pi, "해당 상품을 장바구니에 추가하였습니다.", "안내", JOptionPane.INFORMATION_MESSAGE);
+				} else if (result == 0) {
+					JOptionPane.showMessageDialog(pi, "장바구니에 추가하지 못했습니다.\n잠시 후에 다시 시도해주세요.", "안내",
+							JOptionPane.ERROR_MESSAGE);
 				} else {
-					JOptionPane.showMessageDialog(pi, "상품 담기를 취소했습니다.","안내",JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(pi, "상품 담기를 취소했습니다.", "안내", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
 		});
@@ -269,6 +319,7 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 			public void mouseEntered(MouseEvent e) {
 				btnMyAc.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\\\MyAcFill.png"), 40, 40));
 			}
+
 			@Override
 			public void mouseExited(MouseEvent e) {
 				btnMyAc.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\\\MyAcNull.png"), 40, 40));
@@ -281,7 +332,7 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 			}
 		});
 		contentPane.add(btnMyAc);
-		
+
 		JButton btnHome = new JButton();
 		btnHome.setBorderPainted(false);
 		btnHome.setContentAreaFilled(false);
@@ -292,6 +343,7 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 			public void mouseEntered(MouseEvent e) {
 				btnHome.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\HomeFill.png"), 40, 40));
 			}
+
 			@Override
 			public void mouseExited(MouseEvent e) {
 				btnHome.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\HomeNull.png"), 40, 40));
@@ -302,6 +354,7 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 			public void actionPerformed(ActionEvent e) {
 				btnHome.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\HomeNull.png"), 40, 40));
 				Mainpage mp = Mainpage.getInstance();
+				mp.refresh(pi.mb);
 				mp.setLocationRelativeTo(pi);
 				mp.setVisible(true);
 				dispose();
@@ -313,7 +366,7 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 		lbPrice.setOpaque(true);
 		lbPrice.setHorizontalAlignment(SwingConstants.TRAILING);
 		lbPrice.setBackground(SystemColor.controlHighlight);
-		lbPrice.setFont(new Font("맑은 고딕",Font.BOLD, 15));
+		lbPrice.setFont(new Font("맑은 고딕", Font.BOLD, 15));
 		lbPrice.setBounds(0, 99, 526, 32);
 		contentPane.add(lbPrice);
 
@@ -336,13 +389,14 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 		btnCreateReview.setContentAreaFilled(false);
 		btnCreateReview.setBorderPainted(false);
 		btnCreateReview.setToolTipText("리뷰작성");
-		btnCreateReview.setBounds(474, 451, 40,40);
+		btnCreateReview.setBounds(474, 451, 40, 40);
 		btnCreateReview.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\ComNull.png"), 40, 40));
 		btnCreateReview.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				btnCreateReview.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\ComFill.png"), 40, 40));
 			}
+
 			@Override
 			public void mouseExited(MouseEvent e) {
 				btnCreateReview.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\ComNull.png"), 40, 40));
@@ -355,7 +409,7 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 				ReviewBean rb = new ReviewBean();
 				rb.setMemIdx(pi.mb.getIdx());
 				rb.setProIdx(pi.pb.getProIdx());
-				System.out.println(rb.getMemIdx()+"/"+rb.getProIdx());
+				System.out.println(rb.getMemIdx() + "/" + rb.getProIdx());
 				cr.refresh(rb, true);
 				cr.setLocationRelativeTo(pi);
 				cr.setVisible(true);
@@ -364,7 +418,7 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 		contentPane.add(btnCreateReview);
 
 		comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"최신순", "별점 높은 순", "별점 낮은 순"}));
+		comboBox.setModel(new DefaultComboBoxModel(new String[] { "최신순", "별점 높은 순", "별점 낮은 순" }));
 		comboBox.setBounds(10, 468, 91, 23);
 		comboBox.addActionListener(new ActionListener() {
 			@Override
@@ -373,7 +427,7 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 			}
 		});
 		contentPane.add(comboBox);
-		
+
 		btnCart = new JButton("");
 		btnCart.setBorderPainted(false);
 		btnCart.setContentAreaFilled(false);
@@ -384,6 +438,7 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 			public void mouseEntered(MouseEvent e) {
 				btnCart.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\\\CartFill.png"), 40, 40));
 			}
+
 			@Override
 			public void mouseExited(MouseEvent e) {
 				btnCart.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\\\CartNull.png"), 40, 40));
@@ -401,7 +456,7 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 			}
 		});
 		contentPane.add(btnCart);
-		
+
 		addData();
 		validate();
 	}
@@ -410,13 +465,13 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 	public JPanel createData(ReviewBean bean) {
 		JPanel panel = new JPanel();
 		panel.setLayout(null);
-		
+
 		StringBuilder cDate = new StringBuilder();
 		StringBuilder cs = new StringBuilder();
 		StringBuilder sb = new StringBuilder();
 		sb.append(bean.getComments());
 		if (sb.length() > 5 && sb.substring(0, 5).equals("(수정됨)")) {
-			cDate.append(bean.getComDate()+" / (수정됨)");
+			cDate.append(bean.getComDate() + " / (수정됨)");
 			cs.append(sb.substring(5));
 		} else {
 			cDate.append(bean.getComDate());
@@ -432,10 +487,10 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 		memName.setBounds(10, 10, 480, 15);
 		memName.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
 		panel.add(memName);
-		
+
 		for (int i = 0; i < 5; i++) {
 			JLabel starIcon = new JLabel();
-			starIcon.setBounds(10+15*i, 25, 15, 15);
+			starIcon.setBounds(10 + 15 * i, 25, 15, 15);
 			if (i < bean.getStarRating()) {
 				starIcon.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\StarFill.png"), 15, 15));
 			} else {
@@ -443,16 +498,16 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 			}
 			panel.add(starIcon);
 		}
-		
+
 		JLabel comDate = new JLabel(cDate.toString());
 		comDate.setBounds(90, 25, 400, 15);
 		comDate.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
 		panel.add(comDate);
-		
+
 		JTextArea comments = new JTextArea(cs.toString());
 		comments.setEditable(false);
 		comments.setLineWrap(true);
-		
+
 		JButton btnDeleteReview = new JButton();
 		btnDeleteReview.setBounds(460, 10, 30, 30);
 		btnDeleteReview.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\DeleteNull.png"), 30, 30));
@@ -463,10 +518,12 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 			public void mouseClicked(MouseEvent e) {
 				btnDeleteReview.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\DeleteNull.png"), 30, 30));
 			}
+
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				btnDeleteReview.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\DeleteFill.png"), 30, 30));
 			}
+
 			@Override
 			public void mouseExited(MouseEvent e) {
 				btnDeleteReview.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\DeleteNull.png"), 30, 30));
@@ -475,7 +532,7 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 		btnDeleteReview.addActionListener(this);
 		bean.setDeleteBtn(btnDeleteReview);
 		panel.add(btnDeleteReview);
-		
+
 		JButton btnModifyReview = new JButton();
 		btnModifyReview.setBounds(420, 10, 30, 30);
 		btnModifyReview.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\EditNull.png"), 30, 30));
@@ -486,10 +543,12 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 			public void mouseClicked(MouseEvent e) {
 				btnModifyReview.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\EditNull.png"), 30, 30));
 			}
+
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				btnModifyReview.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\EditFill.png"), 30, 30));
 			}
+
 			@Override
 			public void mouseExited(MouseEvent e) {
 				btnModifyReview.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\EditNull.png"), 30, 30));
@@ -498,7 +557,7 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 		btnModifyReview.addActionListener(this);
 		bean.setModifyBtn(btnModifyReview);
 		panel.add(btnModifyReview);
-		
+
 		JScrollPane sc = new JScrollPane(comments);
 		sc.setBounds(10, 40, 480, 50);
 		sc.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -556,16 +615,17 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 			}
 		}
 		if (type == 0) {
-			int confirm = JOptionPane.showConfirmDialog(pi, "해당 리뷰를 삭제하시겠습니까?","안내",JOptionPane.YES_NO_OPTION);
+			int confirm = JOptionPane.showConfirmDialog(pi, "해당 리뷰를 삭제하시겠습니까?", "안내", JOptionPane.YES_NO_OPTION);
 			if (confirm == JOptionPane.YES_OPTION) {
 				if (sm.deleteReview(rbv.get(idx))) {
-					JOptionPane.showMessageDialog(pi, "해당 리뷰를 성공적으로 삭제했습니다.","안내",JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(pi, "해당 리뷰를 성공적으로 삭제했습니다.", "안내", JOptionPane.INFORMATION_MESSAGE);
 					addData();
 				} else {
-					JOptionPane.showMessageDialog(pi, "리뷰 삭제 중 오류가 발생했습니다.\n 잠시 후 다시 시도해주세요.","경고",JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(pi, "리뷰 삭제 중 오류가 발생했습니다.\n 잠시 후 다시 시도해주세요.", "경고",
+							JOptionPane.ERROR_MESSAGE);
 				}
 			} else {
-				JOptionPane.showMessageDialog(pi, "리뷰 삭제를 취소했습니다.","안내",JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(pi, "리뷰 삭제를 취소했습니다.", "안내", JOptionPane.INFORMATION_MESSAGE);
 			}
 		} else if (type == 1) {
 			CreateReview cr = CreateReview.getInstance();
@@ -574,36 +634,50 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 			cr.setVisible(true);
 		}
 	}
-	public void togglePopUp() {
-		if (isPopUp) {
-			new Thread(this).start();
-			Component[] components = contentPane.getComponents();
-			for (Component component : components) {
-			    component.setEnabled(true);
+
+	public void gradeCheck(MemberBean mb) {
+		if (this.mb.getIdx() != 0) {
+			String oldGrade = this.mb.getGrade();
+			long Amount = sm.selectConsumption(mb.getIdx());
+			if (Amount >= Constant.GRADEDIAMOND) {
+				mb.setGrade(Constant.DIAMOND);
+			} else if (Amount >= Constant.GRADEPLATINUM) {
+				mb.setGrade(Constant.PLATINUM);
+			} else if (Amount >= Constant.GRADEGOLD) {
+				mb.setGrade(Constant.GOLD);
+			} else if (Amount >= Constant.GRADESILVER) {
+				mb.setGrade(Constant.SILVER);
+			} else {
+				mb.setGrade(Constant.BRONZE);
 			}
-			for (int i = 0; i < rbv.size(); i++) {
-				JButton delbtn = rbv.get(i).getDeleteBtn();
-				delbtn.setEnabled(true);
-				JButton modibtn = rbv.get(i).getModifyBtn();
-				modibtn.setEnabled(true);
+			if (!mb.getGrade().equals(oldGrade)) {
+				JOptionPane.showMessageDialog(pi, "회원 등급이 상승하였습니다. 축하합니다.\n"+oldGrade+"->"+mb.getGrade());
 			}
-			scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		} else {
-			new Thread(this).start();
-			Component[] components = contentPane.getComponents();
-			for (Component component : components) {
-			    component.setEnabled(false);
-			}
-			for (int i = 0; i < rbv.size(); i++) {
-				rbv.get(i).getDeleteBtn().setEnabled(false);
-				rbv.get(i).getModifyBtn().setEnabled(false);
-			}
-			scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-		}
+		} refresh(pi.pb, mb);
 	}
 	
+	public void togglePopUp() {
+		new Thread(this).start();
+	}
+
 	@Override
 	public void run() {
+		Component[] components = contentPane.getComponents();
+		for (Component component : components) {
+			component.setEnabled(isPopUp);
+		}
+		for (int i = 0; i < rbv.size(); i++) {
+			JButton delbtn = rbv.get(i).getDeleteBtn();
+			delbtn.setVisible(isPopUp);
+			JButton modibtn = rbv.get(i).getModifyBtn();
+			modibtn.setVisible(isPopUp);
+		}
+		if (isPopUp) {
+			scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+			addData();
+		} else {
+			scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		}
 		try {
 			if (isPopUp) {
 				isPopUp = !isPopUp;
@@ -611,14 +685,14 @@ public class productInfo extends JFrame implements ActionListener, Runnable{
 				for (int i = 0; i < 150; i++) {
 					int x = panelPopUp.getX() + 1;
 					panelPopUp.setLocation(x, panelPopUp.getY());
-					Thread.sleep((long) Math.pow(i/50, 2));
+					Thread.sleep((long) Math.pow(i / 50, 2));
 				}
 			} else {
 				isPopUp = !isPopUp;
 				for (int i = 0; i < 150; i++) {
 					int x = panelPopUp.getX() - 1;
 					panelPopUp.setLocation(x, panelPopUp.getY());
-					Thread.sleep((long) Math.pow(i/50, 2));
+					Thread.sleep((long) Math.pow(i / 50, 2));
 				}
 				btnClosePopUp.setEnabled(true);
 			}

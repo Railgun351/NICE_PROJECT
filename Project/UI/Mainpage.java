@@ -154,7 +154,7 @@ public class Mainpage extends JFrame implements ActionListener,Runnable {
 		lbNoData.setVisible(false);
 		
 		panelPopUp = new JPanel();
-		panelPopUp.setBounds(524, 0, 150, 210);
+		panelPopUp.setBounds(524, 0, 150, 812);
 		panelPopUp.setBackground(new Color(200,200,200,240));
 		
 		contentPane.add(panelPopUp);
@@ -738,33 +738,7 @@ public class Mainpage extends JFrame implements ActionListener,Runnable {
 	}
 	
 	public void togglePopUp() {
-		if (isPopUp) {
-			new Thread(this).start();
-			Component[] components = layeredPane.getComponents();
-			for (Component component : components) {
-			    component.setEnabled(true);
-			}
-			for (int i = 0; i < mpbv.size(); i++) {
-				mpbv.get(i).getBtn().setEnabled(true);
-			}
-			for (int i = 0; i < pageBtns.size(); i++) {
-				pageBtns.get(i).setEnabled(true);
-			}
-			scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		} else {
-			new Thread(this).start();
-			Component[] components = layeredPane.getComponents();
-			for (Component component : components) {
-			    component.setEnabled(false);
-			}
-			for (int i = 0; i < mpbv.size(); i++) {
-				mpbv.get(i).getBtn().setEnabled(false);
-			}
-			for (int i = 0; i < pageBtns.size(); i++) {
-				pageBtns.get(i).setEnabled(false);
-			}
-			scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-		}
+		new Thread(this).start();
 	}
 
 	@Override
@@ -811,6 +785,21 @@ public class Mainpage extends JFrame implements ActionListener,Runnable {
 
 	@Override
 	public void run() {
+		for (int i = 0; i < mpbv.size(); i++) {
+			mpbv.get(i).getBtn().setEnabled(isPopUp);
+		}
+		for (int i = 0; i < pageBtns.size(); i++) {
+			pageBtns.get(i).setEnabled(isPopUp);
+		}
+		Component[] components = layeredPane.getComponents();
+		for (Component component : components) {
+		    component.setEnabled(isPopUp);
+		}
+		if (isPopUp) {
+			scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		} else {
+			scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		}
 		try {
 			if (isPopUp) {
 				isPopUp = !isPopUp;

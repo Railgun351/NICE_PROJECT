@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -72,6 +73,7 @@ public class PasswordChagePage extends JFrame {
 	private PasswordChagePage() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
+		setIconImage(Toolkit.getDefaultToolkit().getImage("./IMG\\LogoIcon.png"));
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -146,13 +148,16 @@ public class PasswordChagePage extends JFrame {
 		btnConfirm.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (tfOldPW.getPassword().toString().equals(mb.getPassword())) {
+				if (new String(tfOldPW.getPassword()).equals(mb.getPassword())) {
 					if (new String(tfNewPw.getPassword()).equals(new String(tfNewPw2.getPassword()))
 							&& !(new String(tfNewPw.getPassword()).equals(""))) {
 						mb.setPassword(new String(tfNewPw2.getPassword()));
 						if (sm.updatePW(mb)) {
-							JOptionPane.showMessageDialog(pcp, "성공적으로 비밀변호를 변경했습니다.", "안내",
+							JOptionPane.showMessageDialog(pcp, "성공적으로 비밀변호를 변경했습니다.\n다시 로그인 해 주세요.", "안내",
 									JOptionPane.INFORMATION_MESSAGE);
+							LoginPage lp = LoginPage.getInstance();
+							lp.setVisible(true);
+							dispose();
 						} else {
 							JOptionPane.showMessageDialog(pcp, "비밀번호 변경중 문제가 발생했습니다.", "경고", JOptionPane.ERROR_MESSAGE);
 						}

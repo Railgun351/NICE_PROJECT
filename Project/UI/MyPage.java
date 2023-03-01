@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -23,7 +24,7 @@ import java.awt.event.MouseEvent;
 public class MyPage extends JFrame {
 
 	private static MyPage myp;
-	private int prePage;
+	public int prePage;
 	private JPanel contentPane;
 	private MemberBean mb = new MemberBean();
 	private CustomMethod cm = new CustomMethod();
@@ -62,6 +63,7 @@ public class MyPage extends JFrame {
 	private MyPage() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 500, 405);
+		setIconImage(Toolkit.getDefaultToolkit().getImage("./IMG\\LogoIcon.png"));
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -78,16 +80,19 @@ public class MyPage extends JFrame {
 				if (myp.prePage == Constant.PREPAGEMAIN) {
 					Mainpage mp = Mainpage.getInstance();
 					mp.setLocationRelativeTo(myp);
+					mp.refresh(myp.mb);
 					mp.setVisible(true);
 					dispose();
 				} else if (myp.prePage == Constant.PREPAGEPRODUCTINFO) {
 					productInfo pi = productInfo.getInstance();
 					pi.setLocationRelativeTo(myp);
+					pi.refresh(pi.pb, myp.mb);
 					pi.setVisible(true);
 					dispose();
 				} else if (myp.prePage == Constant.PREPAGECART) {
 					Shopcart sc = Shopcart.getInstance();
 					sc.setLocationRelativeTo(myp);
+					sc.refresh(myp.mb, sc.prePage);
 					sc.setVisible(true);
 					dispose();
 				}
@@ -143,6 +148,7 @@ public class MyPage extends JFrame {
 				btnHome.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\HomeNull.png"), 30, 30));
 				Mainpage mp = Mainpage.getInstance();
 				mp.setLocationRelativeTo(myp);
+				mp.refresh(myp.mb);
 				mp.setVisible(true);
 				dispose();
 			}
@@ -203,7 +209,7 @@ public class MyPage extends JFrame {
 				btnChangePw.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\\\PWNull.png"), 150, 150));
 				PasswordChagePage pcp = PasswordChagePage.getInstance();
 				pcp.setLocationRelativeTo(myp);
-				pcp.refresh(mb);
+				pcp.refresh(myp.mb);
 				pcp.setVisible(true);
 				dispose();
 			}
@@ -230,7 +236,7 @@ public class MyPage extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				btnSearchOrder.setIcon(cm.resizeIcon(new ImageIcon("./IMG\\\\OrderLogNull.png"), 150, 150));
 				OrderLogPage olp = OrderLogPage.getInstance();
-				olp.refresh(mb);
+				olp.refresh(myp.mb);
 				olp.setLocationRelativeTo(myp);
 				olp.setVisible(true);
 				dispose();

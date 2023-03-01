@@ -9,6 +9,7 @@ public class OrderLogBean {
 	private ProductBean pb;
 	private int quantity;
 	private int status;
+	private int payment;
 	private String orderTimeStamp;
 	private String finalTimeStamp;
 	private JButton btn;
@@ -91,5 +92,13 @@ public class OrderLogBean {
 
 	public void setMemName(String memName) {
 		this.memName = memName;
+	}
+
+	public int getPayment() {
+		return payment;
+	}
+
+	public void setPayment(int payment) {
+		this.payment = payment;
 	}
 }

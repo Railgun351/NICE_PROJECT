@@ -84,7 +84,7 @@ public class LoginPage extends JFrame implements ActionListener{
 		getContentPane().add(panel);
 		panel.setLayout(null);
 
-		tfId = new JTextField("admin");
+		tfId = new JTextField("");
 		tfId.setOpaque(false);
 		tfId.setFont(new Font("굴림", Font.PLAIN, 23));
 		tfId.setBounds(39, 151, 306, 43);

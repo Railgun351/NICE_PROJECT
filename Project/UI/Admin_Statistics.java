@@ -152,7 +152,7 @@ public class Admin_Statistics extends JFrame {
 
 		JScrollPane scrollPane = new JScrollPane(data_panel);
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.setBounds(12, 363, 476, 357);
+		scrollPane.setBounds(0, 363, 500, 357);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 		layeredPane.add(scrollPane);
 
@@ -243,26 +243,27 @@ public class Admin_Statistics extends JFrame {
 
 	public JPanel createData(String labelTxt, int valuesRatio, int values) {
 		JPanel panel = new JPanel();
-//		panel.setBounds(10,y+10,420, 50);
-//		panel.setSize(420, 50);
-//		panel.setPreferredSize(new Dimension(420, 50));
+		panel.setBackground(Color.WHITE);
 		panel.setLayout(null);
 
 		JLabel lblNewLabel = new JLabel(labelTxt);
 //		panel.add(lblNewLabel, BorderLayout.CENTER);
 		lblNewLabel.setBounds(10, 15, 100, 20);
+		lblNewLabel.setFont(new Font("맑은 고딕",Font.PLAIN, 15));
 		panel.add(lblNewLabel);
 
 		JProgressBar progressBar = new JProgressBar();
 		progressBar.setStringPainted(true);
 		progressBar.setValue(valuesRatio);
 //		panel.add(progressBar, BorderLayout.EAST);
-		progressBar.setBounds(120, 15, 250, 20);
+		progressBar.setBounds(120, 15, 290, 20);
+		progressBar.setBorderPainted(false);
 		panel.add(progressBar);
 //		System.out.println(panel.getBounds());
 
-		JLabel lblNewLabel2 = new JLabel(Integer.toString(values));
-		lblNewLabel2.setBounds(380, 15, 100, 20);
+		JLabel lblNewLabel2 = new JLabel(Integer.toString(values)+"건");
+		lblNewLabel2.setBounds(420, 15, 100, 20);
+		lblNewLabel2.setFont(new Font("맑은 고딕",Font.PLAIN, 15));
 		panel.add(lblNewLabel2);
 
 		return panel;
@@ -273,23 +274,27 @@ public class Admin_Statistics extends JFrame {
 //		panel.setBounds(10,y+10,420, 50);
 //		panel.setSize(420, 50);
 //		panel.setPreferredSize(new Dimension(420, 50));
+		panel.setBackground(Color.WHITE);
 		panel.setLayout(null);
 
 		JLabel lblNewLabel = new JLabel(labelTxt);
 //		panel.add(lblNewLabel, BorderLayout.CENTER);
 		lblNewLabel.setBounds(10, 15, 100, 20);
+		lblNewLabel.setFont(new Font("맑은 고딕",Font.PLAIN, 15));
 		panel.add(lblNewLabel);
 
 		JProgressBar progressBar = new JProgressBar();
 		progressBar.setStringPainted(true);
 		progressBar.setValue(valuesRatio);
 //		panel.add(progressBar, BorderLayout.EAST);
-		progressBar.setBounds(120, 15, 250, 20);
+		progressBar.setBounds(120, 15, 200, 20);
+		progressBar.setBorderPainted(false);
 		panel.add(progressBar);
 //		System.out.println(panel.getBounds());
 
 		JLabel lblNewLabel2 = new JLabel(won);
-		lblNewLabel2.setBounds(380, 15, 100, 20);
+		lblNewLabel2.setBounds(340, 15, 100, 20);
+		lblNewLabel2.setFont(new Font("맑은 고딕",Font.PLAIN, 15));
 		panel.add(lblNewLabel2);
 		return panel;
 	}

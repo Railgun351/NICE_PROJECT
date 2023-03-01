@@ -68,9 +68,10 @@ public class Admin_AddInventory extends JFrame {
 	public static Admin_AddInventory getinstance() {
 		if (aa == null) {
 			aa = new Admin_AddInventory();
-		} return aa;
+		}
+		return aa;
 	}
-	
+
 	public void refresh() {
 		updateTable("전체", dtm);
 		sm.selectPro("전체", dtm);
@@ -78,7 +79,7 @@ public class Admin_AddInventory extends JFrame {
 		comboBox.setSelectedIndex(0);
 		validate();
 	}
-	
+
 	/**
 	 * Launch the application.
 	 */
@@ -116,7 +117,7 @@ public class Admin_AddInventory extends JFrame {
 		setContentPane(contentPane);
 		contentPane.add(lp);
 		sm.selectCate(dcbm);
-		
+
 		JLabel bgilb = new JLabel(icon);
 		bgilb.setBounds(0, 0, 550, 731);
 		bgilb.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -148,6 +149,7 @@ public class Admin_AddInventory extends JFrame {
 			public void mouseEntered(MouseEvent e) {
 				btn_Home.setIcon(resizeIcon(new ImageIcon("./IMG\\HomeFill.png"), 40, 40));
 			}
+
 			@Override
 			public void mouseExited(MouseEvent e) {
 				btn_Home.setIcon(resizeIcon(new ImageIcon("./IMG\\HomeNull.png"), 40, 40));
@@ -175,7 +177,7 @@ public class Admin_AddInventory extends JFrame {
 		scrollPane.setBounds(34, 92, 475, 341);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 		lp.add(scrollPane);
-		
+
 		lblNewLabel_1 = new JLabel("");
 		lblNewLabel_1.setFont(new Font("돋움체", Font.BOLD, 20));
 		lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
@@ -251,6 +253,7 @@ public class Admin_AddInventory extends JFrame {
 			public void mouseEntered(MouseEvent e) {
 				btn_Confirm.setIcon(resizeIcon(new ImageIcon("./IMG\\AssignFill.png"), 40, 40));
 			}
+
 			@Override
 			public void mouseExited(MouseEvent e) {
 				btn_Confirm.setIcon(resizeIcon(new ImageIcon("./IMG\\AssignNull.png"), 40, 40));
@@ -270,7 +273,7 @@ public class Admin_AddInventory extends JFrame {
 			}
 		});
 		lp.add(btn_Confirm);
-		
+
 		JButton btn_Delete = new JButton("");
 		btn_Delete.setFocusPainted(false);
 		btn_Delete.setContentAreaFilled(false);
@@ -284,6 +287,7 @@ public class Admin_AddInventory extends JFrame {
 			public void mouseEntered(MouseEvent e) {
 				btn_Delete.setIcon(resizeIcon(new ImageIcon("./IMG\\DeleteFill.png"), 40, 40));
 			}
+
 			@Override
 			public void mouseExited(MouseEvent e) {
 				btn_Delete.setIcon(resizeIcon(new ImageIcon("./IMG\\DeleteNull.png"), 40, 40));
@@ -292,10 +296,22 @@ public class Admin_AddInventory extends JFrame {
 		btn_Delete.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int selected = JOptionPane.showConfirmDialog(aa, "선택한 상품을 삭제합니다. 정말로 삭제하시겠습니까?","주의",JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				int selected = JOptionPane.showConfirmDialog(aa, "선택한 상품을 삭제합니다. 정말로 삭제하시겠습니까?", "주의",
+						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 				if (selected == 0) {
 					if (sm.deletePro(pb)) {
 						JOptionPane.showMessageDialog(aa, "성공적으로 상품이 삭제되었습니다.", "성공", JOptionPane.INFORMATION_MESSAGE);
+						File file = new File(pb.getImgAddress());
+
+						if (file.exists()) {
+							if (file.delete()) {
+								System.out.println("파일삭제 성공");
+							} else {
+								System.out.println("파일삭제 실패");
+							}
+						} else {
+							System.out.println("파일이 존재하지 않습니다.");
+						}
 						sm.selectCate(dcbm);
 						String cate = (String) comboBox.getSelectedItem();
 						updateTable(cate, dtm);
@@ -305,7 +321,7 @@ public class Admin_AddInventory extends JFrame {
 								JOptionPane.ERROR_MESSAGE);
 					}
 				} else {
-					JOptionPane.showMessageDialog(aa, "상품 삭제를 취소했습니다.","안내",JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(aa, "상품 삭제를 취소했습니다.", "안내", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
 		});
@@ -314,6 +330,7 @@ public class Admin_AddInventory extends JFrame {
 //		btnNewButton_2.setFocusPainted(false);
 		table.updateUI();
 		comboBox.addActionListener(new ActionListener() {
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String cate = (String) comboBox.getSelectedItem();
@@ -321,18 +338,18 @@ public class Admin_AddInventory extends JFrame {
 				updateTable(cate, dtm);
 			}
 		});
-		
+
 		JLabel lbLogo = new JLabel();
 		lbLogo.setBounds(80, 10, 69, 39);
 		lbLogo.setIcon(resizeIcon(new ImageIcon("./IMG\\LOGO.png"), 69, 39));
 		lp.add(lbLogo);
-		
+
 		updateTable("전체", dtm);
 		sm.selectPro("전체", dtm);
 		setVisible(true);
 		validate();
 	}
-	
+
 	public Icon resizeIcon(ImageIcon ii, int w, int h) {
 		ImageIcon ic = ii;
 		Image img = ic.getImage();
@@ -340,7 +357,7 @@ public class Admin_AddInventory extends JFrame {
 		ic = new ImageIcon(img2);
 		return ic;
 	}
-	
+
 	public void tableSelect() {
 		int row = table.getSelectedRow();
 		String path = null;
@@ -353,8 +370,7 @@ public class Admin_AddInventory extends JFrame {
 		if (path == null) {
 			lblNewLabel_1.setIcon(null);
 			lblNewLabel_1.setText("No Image");
-		}
-		else {
+		} else {
 			lblNewLabel_1.setText("");
 			ImageIcon ic = new ImageIcon(path);
 			Image img = ic.getImage();
@@ -371,7 +387,7 @@ public class Admin_AddInventory extends JFrame {
 		pbv = sm.selectPro(Cate, dtm);
 		table.updateUI();
 	}
-	
+
 	public void resetInfo() {
 		this.pb = new ProductBean();
 		textField.setText("");
