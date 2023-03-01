@@ -24,9 +24,10 @@ import javax.swing.JFileChooser;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
 import java.io.*;
 import java.lang.invoke.StringConcatFactory;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Vector;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
@@ -41,10 +42,13 @@ public class AddProduct extends JFrame {
 	private JTextField tfCate, tfName, tfPrice, tfInven;
 	private FileDialog openDialog, saveDialog;
 	private File src;
+	private JComboBox combo_cate;
 	private ShopMgr sm = ShopMgr.getInstance();
 	private String imgAdd;
+	private JLabel img_1;
 	private ProductBean pb = new ProductBean();
 	private DefaultComboBoxModel<String> cateList = new DefaultComboBoxModel<>();
+	private Vector<Integer> cateIdx = new Vector<>();
 
 	/**
 	 * Launch the application.
@@ -65,9 +69,19 @@ public class AddProduct extends JFrame {
 	public static AddProduct getInstance() {
 		if (ap == null) {
 			ap = new AddProduct();
-		} return ap;
+		}
+		return ap;
 	}
-	
+
+	public void refresh() {
+		ap.cateIdx = sm.comboList(cateList);
+		combo_cate.setSelectedIndex(0);
+		tfCate.setText("");
+		tfInven.setText("");
+		tfName.setText("");
+		tfPrice.setText("");
+	}
+
 	/**
 	 * Create the application.
 	 */
@@ -79,7 +93,7 @@ public class AddProduct extends JFrame {
 		getContentPane().setLayout(null);
 		setLocationRelativeTo(null);
 		setResizable(false);
-		JLabel img_1 = new JLabel("");
+		img_1 = new JLabel("");
 
 		JLayeredPane panel = new JLayeredPane();
 		panel.setBounds(-10, -20, 534, 810);
@@ -122,14 +136,14 @@ public class AddProduct extends JFrame {
 		tfInven.setColumns(10);
 
 		// 카테고리 선택 콤보박스
-		sm.comboList(cateList);
-		JComboBox combo_cate = new JComboBox(cateList);
+		cateIdx = sm.comboList(cateList);
+		combo_cate = new JComboBox(cateList);
 		combo_cate.setForeground(new Color(0, 0, 0));
 		combo_cate.setFont(new Font("돋움", Font.BOLD, 17));
 		combo_cate.setBackground(new Color(255, 255, 255));
 		combo_cate.setBounds(43, 80, 168, 60);
 		panel.add(combo_cate);
-		
+
 		JButton btn_home = new JButton("");
 		btn_home.setBorderPainted(false);
 		btn_home.setContentAreaFilled(false);
@@ -140,6 +154,7 @@ public class AddProduct extends JFrame {
 			public void mouseEntered(MouseEvent e) {
 				btn_home.setIcon(resizeIcon(new ImageIcon("./IMG\\HomeFill.png"), 40, 40));
 			}
+
 			@Override
 			public void mouseExited(MouseEvent e) {
 				btn_home.setIcon(resizeIcon(new ImageIcon("./IMG\\HomeNull.png"), 40, 40));
@@ -149,7 +164,9 @@ public class AddProduct extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				btn_home.setIcon(resizeIcon(new ImageIcon("./IMG\\HomeNull.png"), 40, 40));
+				resetInfo();
 				Mainpage mp = Mainpage.getInstance();
+				mp.setLocationRelativeTo(ap);
 				mp.setVisible(true);
 				dispose();
 			}
@@ -180,14 +197,23 @@ public class AddProduct extends JFrame {
 		});
 		btn_Back.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				resetInfo();
 				AdminMain am = AdminMain.getinstance();
+				am.setLocationRelativeTo(ap);
 				am.setVisible(true);
 				dispose();
 			}
 		});
+<<<<<<< HEAD:Project/ui/AddProduct.java
 		btn_Back.setBounds(30, 30, 40, 40);
 		panel.add(btn_Back);
 		
+=======
+		btn_back.setContentAreaFilled(false);
+		btn_back.setBounds(30, 30, 40, 40);
+		panel.add(btn_back);
+
+>>>>>>> 2e31d6211e926b535d439a23067bc5f0b7a9770d:Project/UI/AddProduct.java
 		JLabel lbLogo = new JLabel();
 		lbLogo.setBounds(80, 30, 69, 39);
 		lbLogo.setIcon(resizeIcon(new ImageIcon("./IMG\\LOGO.png"), 69, 39));
@@ -253,22 +279,42 @@ public class AddProduct extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (e.getSource() == add_img) {
 					FileDialog fdOpenDialog = new FileDialog(openDialog);
+					fdOpenDialog.setFilenameFilter(new FilenameFilter() {
+						@Override
+						public boolean accept(File dir, String name) {
+							String[] str = name.split(".");
+							System.out.println(str[0] + "/" + str[1]);
+							if (str[1].equals("png")) {
+								return true;
+							} else {
+								return false;
+							}
+						}
+					});
 					fdOpenDialog.setVisible(true);
 
 					String path = fdOpenDialog.getDirectory();// 파일경로
 					String name = fdOpenDialog.getFile();// 파일이름
 
 					if (path != null) {
-//						img_1.setText(path+name);
-						System.out.println(path + name);
-						src = new File(path + name);
-						ImageIcon icon_add = new ImageIcon((path + name));
-						Image img1 = icon_add.getImage();
-						Image chanImage = img1.getScaledInstance(453, 331, img1.SCALE_SMOOTH);
-						ImageIcon changeIcon = new ImageIcon(chanImage);
-//						img_1.setIcon(new ImageIcon(path+name));
-						img_1.setIcon(changeIcon);
+						String[] str = name.split("\\.");
+						String ex = str[str.length-1].toLowerCase();
+						if (ex.equals("png") || ex.equals("jpeg") || ex.equals("jpg")) {
+							System.out.println(path + name);
+							src = new File(path + name);
+							ImageIcon icon_add = new ImageIcon((path + name));
+							Image img1 = icon_add.getImage();
+							Image chanImage = img1.getScaledInstance(453, 331, img1.SCALE_SMOOTH);
+							ImageIcon changeIcon = new ImageIcon(chanImage);
+							img_1.setIcon(changeIcon);
+						} else {
+							JOptionPane.showMessageDialog(ap, "png, jpg, jpeg형식의 이미지만 불러올 수 있습니다.","경고",JOptionPane.ERROR_MESSAGE);
+						}
 					}
+//						img_1.setText(path+name);
+
+//						img_1.setIcon(new ImageIcon(path+name));
+
 				}
 
 			}
@@ -322,21 +368,26 @@ public class AddProduct extends JFrame {
 //					FileDialog addDialog = new FileDialog(saveDialog);
 //					addDialog.setVisible(true);
 //					JFileChooser jfc = new JFileChooser();
-
-					pb.setCateIdx(combo_cate.getSelectedIndex());
-					pb.setProName(tfName.getText());
-					pb.setPrice(Integer.parseInt(tfPrice.getText().trim()));
-					pb.setInventory(Integer.parseInt(tfInven.getText().trim()));
-					pb.setImgAddress(null);
-					pb = sm.addProduct(pb);
-					if (pb.getProIdx() != -1) {
-						JOptionPane.showMessageDialog(null, "상품 등록 완료");
-						imgCopy();
-
-					} else {
-						JOptionPane.showMessageDialog(null, "상품 등록 실패");
+					try {
+						pb.setCateIdx(ap.cateIdx.get(combo_cate.getSelectedIndex()));
+						pb.setProName(tfName.getText());
+						pb.setPrice(Integer.parseInt(tfPrice.getText().trim()));
+						pb.setInventory(Integer.parseInt(tfInven.getText().trim()));
+						pb.setImgAddress(null);
+						pb = sm.addProduct(pb);
+						if (src == null) {
+							throw new Exception();
+						}
+						if (pb.getProIdx() != -1) {
+							JOptionPane.showMessageDialog(ap, "상품 등록 완료");
+							imgCopy();
+							resetInfo();
+						} else {
+							JOptionPane.showMessageDialog(ap, "상품 등록 실패");
+						}
+					} catch (Exception e2) {
+						JOptionPane.showMessageDialog(ap, "올바른 상품정보를 입력했는지 확인해 주세요. (이미지 필수)","경고",JOptionPane.ERROR_MESSAGE);
 					}
-
 				}
 			}
 		});
@@ -351,7 +402,7 @@ public class AddProduct extends JFrame {
 		add_cate.setIcon(ac);
 		add_cate.setBorderPainted(false);
 		add_cate.setContentAreaFilled(false);
-		
+
 		add_cate.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -383,10 +434,10 @@ public class AddProduct extends JFrame {
 //					sm.addCate(addCate11);
 					System.out.println(addCate11);
 					if (tfCate.getText() != null && sm.addCate(addCate11)) {
-						JOptionPane.showMessageDialog(null, "카테고리 추가 성공");
-						sm.comboList(cateList);
+						JOptionPane.showMessageDialog(ap, "카테고리 추가 성공");
+						cateIdx = sm.comboList(cateList);
 					} else {
-						JOptionPane.showMessageDialog(null, "카테고리 추가 실패");
+						JOptionPane.showMessageDialog(ap, "카테고리 추가 실패");
 					}
 
 				}
@@ -413,17 +464,27 @@ public class AddProduct extends JFrame {
 			fi.close();
 			fo.close();
 			System.out.println("복사 성공");
-		} catch (IOException e) {
+		} catch (Exception e) {
 			System.out.println("복사 오류");
 		}
 	}
-	
-	//이미지크기조절
+
+	// 이미지크기조절
 	public Icon resizeIcon(ImageIcon ii, int w, int h) {
 		ImageIcon ic = ii;
 		Image img = ic.getImage();
 		Image img2 = img.getScaledInstance(w, h, Image.SCALE_SMOOTH);
 		ic = new ImageIcon(img2);
 		return ic;
+	}
+	
+	public void resetInfo() {
+		tfCate.setText("");
+		tfInven.setText("");
+		tfName.setText("");
+		tfPrice.setText("");
+		img_1.setIcon(null);
+		src = null;
+		combo_cate.setSelectedIndex(0);
 	}
 }

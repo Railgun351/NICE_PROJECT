@@ -65,6 +65,33 @@ public class AdminMain extends JFrame {
 		layeredPane.setBounds(0, 0, 360, 405);
 		contentPane.add(layeredPane);
 		
+		JButton btnHome = new JButton();
+		btnHome.setBorderPainted(false);
+		btnHome.setContentAreaFilled(false);
+		btnHome.setBounds(308, 10, 40, 40);
+		btnHome.setIcon(resizeIcon(new ImageIcon("./IMG\\HomeNull.png"), 40, 40));
+		btnHome.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btnHome.setIcon(resizeIcon(new ImageIcon("./IMG\\HomeFill.png"), 40, 40));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btnHome.setIcon(resizeIcon(new ImageIcon("./IMG\\HomeNull.png"), 40, 40));
+			}
+		});
+		btnHome.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				btnHome.setIcon(resizeIcon(new ImageIcon("./IMG\\HomeNull.png"), 40, 40));
+				Mainpage mp = Mainpage.getInstance();
+				mp.setLocationRelativeTo(adminMain);
+				mp.setVisible(true);
+				dispose();
+			}
+		});
+		contentPane.add(btnHome);
+		
 		JButton btnNewPro = new JButton();
 		btnNewPro.setFocusPainted(false);
 		btnNewPro.setContentAreaFilled(false);
@@ -86,6 +113,8 @@ public class AdminMain extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				btnNewPro.setIcon(resizeIcon(new ImageIcon("./IMG\\NewProNull.png"), 100, 100));
 				AddProduct ap = AddProduct.getInstance();
+				ap.setLocationRelativeTo(adminMain);
+				ap.refresh();
 				ap.setVisible(true);
 				dispose();
 			}
@@ -112,6 +141,8 @@ public class AdminMain extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Admin_AddInventory aa = Admin_AddInventory.getinstance();
+				aa.setLocationRelativeTo(adminMain);
+				aa.refresh();
 				aa.setVisible(true);
 				btnAddInven.setIcon(resizeIcon(new ImageIcon("./IMG\\AddInvenNull.png"), 100, 100));
 				dispose();
@@ -140,38 +171,42 @@ public class AdminMain extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				btnChart.setIcon(resizeIcon(new ImageIcon("./IMG\\ChartNull.png"), 100, 100));
 				Admin_Statistics as = Admin_Statistics.getinstance();
+				as.setLocationRelativeTo(adminMain);
+				as.doingSearch();
 				as.setVisible(true);
 				dispose();
 			}
 		});
 		layeredPane.add(btnChart);
 		
-		JButton btnHome = new JButton("New button");
-		btnHome.setFocusPainted(false);
-		btnHome.setContentAreaFilled(false);
-		btnHome.setBorderPainted(false);
-		btnHome.setBounds(206, 242, 100, 100);
-		btnHome.setIcon(resizeIcon(new ImageIcon("./IMG\\HomeNull.png"), 100, 100));
-		btnHome.addMouseListener(new MouseAdapter() {
+		JButton btnDelivery = new JButton("New button");
+		btnDelivery.setFocusPainted(false);
+		btnDelivery.setContentAreaFilled(false);
+		btnDelivery.setBorderPainted(false);
+		btnDelivery.setBounds(206, 242, 100, 100);
+		btnDelivery.setIcon(resizeIcon(new ImageIcon("./IMG\\DeliNull.png"), 100, 100));
+		btnDelivery.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				btnHome.setIcon(resizeIcon(new ImageIcon("./IMG\\HomeFill.png"), 100, 100));
+				btnDelivery.setIcon(resizeIcon(new ImageIcon("./IMG\\DeliFill.png"), 100, 100));
 			}
 			@Override
 			public void mouseExited(MouseEvent e) {
-				btnHome.setIcon(resizeIcon(new ImageIcon("./IMG\\HomeNull.png"), 100, 100));
+				btnDelivery.setIcon(resizeIcon(new ImageIcon("./IMG\\DeliNull.png"), 100, 100));
 			}
 		});
-		btnHome.addActionListener(new ActionListener() {
+		btnDelivery.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				btnHome.setIcon(resizeIcon(new ImageIcon("./IMG\\HomeNull.png"), 100, 100));
-				Mainpage mp = Mainpage.getInstance();
-				mp.setVisible(true);
+				btnDelivery.setIcon(resizeIcon(new ImageIcon("./IMG\\DeliNull.png"), 100, 100));
+				DeliveryManagementPage dmp = DeliveryManagementPage.getInstance();
+				dmp.setLocationRelativeTo(adminMain);
+				dmp.refresh();
+				dmp.setVisible(true);
 				dispose();
 			}
 		});
-		layeredPane.add(btnHome);
+		layeredPane.add(btnDelivery);
 		
 		JLabel lblNewLabel = new JLabel("관리자 메뉴");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -197,7 +232,7 @@ public class AdminMain extends JFrame {
 		lblNewLabel_1_1_1.setBounds(50, 352, 100, 30);
 		layeredPane.add(lblNewLabel_1_1_1);
 		
-		JLabel lblNewLabel_1_1_1_1 = new JLabel("홈으로");
+		JLabel lblNewLabel_1_1_1_1 = new JLabel("배송관리");
 		lblNewLabel_1_1_1_1.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
 		lblNewLabel_1_1_1_1.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel_1_1_1_1.setBounds(203, 352, 100, 30);

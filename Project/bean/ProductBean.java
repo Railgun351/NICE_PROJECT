@@ -9,6 +9,7 @@ public class ProductBean {
 	private int price;
 	private String imgAddress;
 	private int inventory;
+	
 	public int getProIdx() {
 		return proIdx;
 	}

@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Member;
@@ -16,24 +18,22 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
-import project.bean.CartBean;
+import project.bean.Constant;
 import project.bean.MainProductBean;
 import project.bean.MemberBean;
-import project.bean.ProductBean;
 import project.db.ShopMgr;
 
 import javax.swing.JLayeredPane;
-import javax.swing.JOptionPane;
 import javax.swing.JLabel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.JButton;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 
@@ -42,12 +42,12 @@ import java.awt.Font;
 import java.awt.GridLayout;
 
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
 import java.awt.Toolkit;
-import javax.swing.JSlider;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.JRadioButton;
+import javax.swing.ButtonGroup;
 
-public class Mainpage extends JFrame implements ActionListener {
+public class Mainpage extends JFrame implements ActionListener,Runnable {
 
 	private static Mainpage mp;
 	private JPanel contentPane;
@@ -68,14 +68,26 @@ public class Mainpage extends JFrame implements ActionListener {
 	private int firstPage = 1;
 	private String ImgName = "./IMG\\";
 	private String selectedCate = "전체";
+	private JLabel lbNoData;
 	private boolean isSearchResult = false;
-	private Vector<MainProductBean> mpbv;
+	private Vector<MainProductBean> mpbv = new Vector<>();
 	private int pageBtnPanelX[] = { 242, 217, 192 };
 	private int pageBtnPanelW[] = { 40, 90, 140 };
 	private Vector<JButton> pageBtns = new Vector<>();
 	private ShopMgr sm = ShopMgr.getInstance();
 	private JButton btnCart;
 	private JButton btnSetting;
+	private JRadioButton rdbtnNewRadioButton;
+	private JRadioButton rdbtnNewRadioButton_1;
+	private JRadioButton rdbtnNewRadioButton_2;
+	private boolean isPopUp;
+	private JPanel panelPopUp;
+	private final ButtonGroup buttonGroup = new ButtonGroup();
+	private JLabel lbPopUpGrade;
+	private JLabel lbPopUpPoint;
+	private JButton btnMyPage;
+	private JLabel lbPopUpName;
+	private JButton btnClosePopUp;
 
 	public static Mainpage getInstance() {
 		if (mp == null) {
@@ -87,6 +99,10 @@ public class Mainpage extends JFrame implements ActionListener {
 		this.mem = mem;
 		lbMainTitle.setText(mem.getName()+"님 환영합니다.");
 		String type = mem.getType().replaceAll(" ", "");
+		setTitle("NICE 메인 페이지 - "+mem.getName()+"님");
+		lbPopUpName.setText(mem.getName()+"님");
+		lbPopUpGrade.setText("등급 : "+mem.getGrade());
+		lbPopUpPoint.setText("포인트 : "+mem.getPoint());
 		if (type.equals("일반")) {
 			btnSetting.setVisible(false);
 		} else {
@@ -120,7 +136,7 @@ public class Mainpage extends JFrame implements ActionListener {
 		this.mem = mem;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 540, 851);
-		setTitle("NICE 메인 페이지");
+		setTitle("NICE 메인 페이지 - "+mem.getName()+"님");
 		setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -128,6 +144,78 @@ public class Mainpage extends JFrame implements ActionListener {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		contentPane.setBackground(Color.WHITE);
+		
+		lbNoData = new JLabel("찾으시는 상품이 존재하지 않습니다");
+		lbNoData.setFont(new Font("맑은 고딕", Font.BOLD, 18));
+		lbNoData.setHorizontalTextPosition(SwingConstants.CENTER);
+		lbNoData.setHorizontalAlignment(SwingConstants.CENTER);
+		lbNoData.setOpaque(true);
+		lbNoData.setBounds(112, 360, 300, 300);
+		lbNoData.setVisible(false);
+		
+		panelPopUp = new JPanel();
+		panelPopUp.setBounds(524, 0, 150, 812);
+		panelPopUp.setBackground(new Color(200,200,200,240));
+		
+		contentPane.add(panelPopUp);
+		panelPopUp.setLayout(null);
+		
+		btnClosePopUp = new JButton("");
+		btnClosePopUp.setContentAreaFilled(false);
+		btnClosePopUp.setBorderPainted(false);
+		btnClosePopUp.setBounds(12, 10, 30, 30);
+		btnClosePopUp.setIcon(resizeIcon(new ImageIcon("./IMG\\XNull.png"), 30, 30));
+		btnClosePopUp.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btnClosePopUp.setIcon(resizeIcon(new ImageIcon("./IMG\\XFill.png"), 30, 30));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btnClosePopUp.setIcon(resizeIcon(new ImageIcon("./IMG\\XNull.png"), 30, 30));
+			}
+		});
+		btnClosePopUp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				btnClosePopUp.setIcon(resizeIcon(new ImageIcon("./IMG\\XNull.png"), 30, 30));
+				togglePopUp();
+			}
+		});
+		panelPopUp.add(btnClosePopUp);
+		
+		lbPopUpName = new JLabel("New label");
+		lbPopUpName.setFont(new Font("맑은 고딕", Font.BOLD, 20));
+		lbPopUpName.setBounds(12, 44, 126, 30);
+		panelPopUp.add(lbPopUpName);
+		
+		lbPopUpGrade = new JLabel("New label");
+		lbPopUpGrade.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
+		lbPopUpGrade.setBounds(12, 84, 126, 30);
+		panelPopUp.add(lbPopUpGrade);
+		
+		lbPopUpPoint = new JLabel("New label");
+		lbPopUpPoint.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
+		lbPopUpPoint.setBounds(12, 124, 126, 30);
+		panelPopUp.add(lbPopUpPoint);
+		
+		btnMyPage = new JButton("마이페이지");
+		btnMyPage.setContentAreaFilled(false);
+		btnMyPage.setBounds(12, 164, 126, 30);
+		btnMyPage.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				MyPage myp = MyPage.getInstance();
+				myp.refresh(mp.mem, Constant.PREPAGEMAIN);
+				myp.setLocationRelativeTo(mp);
+				myp.setVisible(true);
+				togglePopUp();
+				dispose();
+			}
+		});
+		panelPopUp.add(btnMyPage);
+		contentPane.add(lbNoData);
 
 		layeredPane = new JLayeredPane();
 		layeredPane.setBounds(0, 0, 524, 812);
@@ -137,6 +225,7 @@ public class Mainpage extends JFrame implements ActionListener {
 		sm.selectCate(dcbm);
 		comboBoxCategory = new JComboBox(dcbm);
 		comboBoxCategory.setBounds(12, 193, 86, 32);
+		comboBoxCategory.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
 		comboBoxCategory.addActionListener(new ActionListener() {
 
 			@Override
@@ -246,11 +335,34 @@ public class Mainpage extends JFrame implements ActionListener {
 		lbCurrentPage.setBounds(137, 249, 250, 30);
 		layeredPane.add(lbCurrentPage);
 		
+		JButton btnMyAc = new JButton("");
+		btnMyAc.setBorderPainted(false);
+		btnMyAc.setContentAreaFilled(false);
+		btnMyAc.setIcon(resizeIcon(new ImageIcon("./IMG\\\\MyAcNull.png"), 40, 40));
+		btnMyAc.setBounds(472, 10, 40, 40);
+		btnMyAc.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btnMyAc.setIcon(resizeIcon(new ImageIcon("./IMG\\\\MyAcFill.png"), 40, 40));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btnMyAc.setIcon(resizeIcon(new ImageIcon("./IMG\\\\MyAcNull.png"), 40, 40));
+			}
+		});
+		btnMyAc.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				togglePopUp();
+			}
+		});
+		layeredPane.add(btnMyAc);
+		
 		JButton btnLogOut = new JButton("");
 		btnLogOut.setBorderPainted(false);
 		btnLogOut.setContentAreaFilled(false);
+		btnLogOut.setBounds(420, 10, 40, 40);
 		btnLogOut.setIcon(resizeIcon(new ImageIcon("./IMG\\\\LogOutNull.png"), 40, 40));
-		btnLogOut.setBounds(472, 10, 40, 40);
 		btnLogOut.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -266,6 +378,7 @@ public class Mainpage extends JFrame implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				btnLogOut.setIcon(resizeIcon(new ImageIcon("./IMG\\\\LogOutNull.png"), 40, 40));
 				LoginPage lp = LoginPage.getInstance();
+				lp.setLocationRelativeTo(mp);
 				lp.setVisible(true);
 				dispose();
 			}
@@ -275,7 +388,7 @@ public class Mainpage extends JFrame implements ActionListener {
 		btnCart = new JButton("");
 		btnCart.setBorderPainted(false);
 		btnCart.setContentAreaFilled(false);
-		btnCart.setBounds(420, 10, 40, 40);
+		btnCart.setBounds(368, 10, 40, 40);
 		btnCart.setIcon(resizeIcon(new ImageIcon("./IMG\\\\CartNull.png"), 40, 40));
 		btnCart.addMouseListener(new MouseAdapter() {
 			@Override
@@ -291,8 +404,14 @@ public class Mainpage extends JFrame implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				btnCart.setIcon(resizeIcon(new ImageIcon("./IMG\\\\CartNull.png"), 40, 40));
+<<<<<<< HEAD:Project/ui/Mainpage.java
 				shopcart sc = shopcart.getInstance();
 				sc.refresh(mp.mem);
+=======
+				Shopcart sc = Shopcart.getInstance();
+				sc.refresh(mp.mem, Constant.PREPAGEMAIN);
+				sc.setLocationRelativeTo(mp);
+>>>>>>> 2e31d6211e926b535d439a23067bc5f0b7a9770d:Project/UI/Mainpage.java
 				sc.setVisible(true);
 				dispose();
 			}
@@ -302,7 +421,7 @@ public class Mainpage extends JFrame implements ActionListener {
 		btnSetting = new JButton("");
 		btnSetting.setBorderPainted(false);
 		btnSetting.setContentAreaFilled(false);
-		btnSetting.setBounds(368, 10, 40, 40);
+		btnSetting.setBounds(316, 10, 40, 40);
 		btnSetting.setIcon(resizeIcon(new ImageIcon("./IMG\\SettingNull.png"), 40, 40));
 		btnSetting.addMouseListener(new MouseAdapter() {
 			@Override
@@ -319,12 +438,68 @@ public class Mainpage extends JFrame implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				btnSetting.setIcon(resizeIcon(new ImageIcon("./IMG\\SettingNull.png"), 40, 40));
 				AdminMain am = AdminMain.getinstance();
+				am.setLocationRelativeTo(mp);
 				am.setVisible(true);
 				dispose();
 			}
 		});
 		btnSetting.setVisible(false);
 		layeredPane.add(btnSetting);
+		
+		rdbtnNewRadioButton = new JRadioButton("가격 낮은 순");
+		buttonGroup.add(rdbtnNewRadioButton);
+		rdbtnNewRadioButton.setHorizontalAlignment(SwingConstants.CENTER);
+		rdbtnNewRadioButton.setOpaque(false);
+		rdbtnNewRadioButton.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+		rdbtnNewRadioButton.setBounds(420, 159, 96, 23);
+		rdbtnNewRadioButton.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (isSearchResult) {
+					addDataByS(textFieldSearch.getText());
+				} else {
+					addDataByC(selectedCate);
+				}
+			}
+		});
+		layeredPane.add(rdbtnNewRadioButton);
+		
+		rdbtnNewRadioButton_1 = new JRadioButton("가격 높은 순");
+		buttonGroup.add(rdbtnNewRadioButton_1);
+		rdbtnNewRadioButton_1.setHorizontalAlignment(SwingConstants.CENTER);
+		rdbtnNewRadioButton_1.setOpaque(false);
+		rdbtnNewRadioButton_1.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+		rdbtnNewRadioButton_1.setBounds(320, 159, 96, 23);
+		rdbtnNewRadioButton_1.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (isSearchResult) {
+					addDataByS(textFieldSearch.getText());
+				} else {
+					addDataByC(selectedCate);
+				}
+			}
+		});
+		layeredPane.add(rdbtnNewRadioButton_1);
+		
+		rdbtnNewRadioButton_2 = new JRadioButton("판매 인기 순");
+		buttonGroup.add(rdbtnNewRadioButton_2);
+		rdbtnNewRadioButton_2.setSelected(true);
+		rdbtnNewRadioButton_2.setHorizontalAlignment(SwingConstants.CENTER);
+		rdbtnNewRadioButton_2.setOpaque(false);
+		rdbtnNewRadioButton_2.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+		rdbtnNewRadioButton_2.setBounds(220, 159, 96, 23);
+		rdbtnNewRadioButton_2.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (isSearchResult) {
+					addDataByS(textFieldSearch.getText());
+				} else {
+					addDataByC(selectedCate);
+				}
+			}
+		});
+		layeredPane.add(rdbtnNewRadioButton_2);
 
 		JLabel lbBack = new JLabel("");
 //		lbBack.setIcon(new ImageIcon("C:\\Java\\eclipse-workspace\\NICE_PROJECT\\IMG\\MainPage.png"));
@@ -346,7 +521,7 @@ public class Mainpage extends JFrame implements ActionListener {
 
 		JLabel imgLb = new JLabel("NO IMG");
 		imgLb.setHorizontalAlignment(JLabel.CENTER);
-		ImageIcon ic = new ImageIcon(mpb.getImgAddress());
+		ImageIcon ic = new ImageIcon(mpb.getPb().getImgAddress());
 		Image img = ic.getImage();
 		Image img2 = img.getScaledInstance(210, 210, Image.SCALE_SMOOTH);
 		ic = new ImageIcon(img2);
@@ -356,19 +531,22 @@ public class Mainpage extends JFrame implements ActionListener {
 		imgLb.setBorder(new LineBorder(Color.BLACK));
 		panel.add(imgLb);
 
-		JLabel nameLb = new JLabel(mpb.getProName());
+		JLabel nameLb = new JLabel(mpb.getPb().getProName());
 		nameLb.setBounds(10, 220, 210, 30);
 		nameLb.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		nameLb.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
 		panel.add(nameLb);
 		
-		JLabel cateLb = new JLabel(mpb.getCategoryName());
+		JLabel cateLb = new JLabel(mpb.getPb().getCateName());
 		cateLb.setBounds(10, 250, 210, 30);
 		cateLb.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		cateLb.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
 		panel.add(cateLb);
 
-		JLabel priceLb = new JLabel(toWon(mpb.getPrice()));
+		JLabel priceLb = new JLabel(toWon(mpb.getPb().getPrice()));
 		priceLb.setBounds(10, 280, 210, 30);
 		priceLb.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		priceLb.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
 		panel.add(priceLb);
 
 		JButton btn = new JButton();
@@ -388,7 +566,15 @@ public class Mainpage extends JFrame implements ActionListener {
 	public void addDataByC(String cate) {
 		dataPanel.removeAll();
 		scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMinimum());
-		mpbv = sm.selectPro(cate);
+		int mode = -1;
+		if (rdbtnNewRadioButton_2.isSelected()) {
+			mode = Constant.SORTPOPULARITY;
+		} else if (rdbtnNewRadioButton_1.isSelected()) {
+			mode = Constant.SORTPRICEDESC;
+		} else {
+			mode = Constant.SORTPRICEASC;
+		}
+		mpbv = sm.selectPro(cate, mode);
 		lbSearchResult.setText(mpbv.size() + "개 결과");
 		int pageAmount = (int) Math.ceil(mpbv.size() / 20.0);
 		boolean isLastPage = false;
@@ -429,38 +615,53 @@ public class Mainpage extends JFrame implements ActionListener {
 		dataPanel.removeAll();
 		scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMinimum());
 		String trimWord = word.trim().replaceAll(" ", "");
-		mpbv = sm.selectProBySearch(trimWord);
-		lbSearchResult.setText(mpbv.size() + "개 결과");
-		int pageAmount = (int) Math.ceil(mpbv.size() / 20.0);
-		boolean isLastPage = false;
-		int lastIdx = 0;
-		pageSetting(pageAmount);
-		if (pageAmount <= currentPage) {
-			currentPage = pageAmount;
-			isLastPage = true;
-		}
-		if (isLastPage) {
-			lastIdx = mpbv.size();
+		int mode = -1;
+		if (rdbtnNewRadioButton_2.isSelected()) {
+			mode = Constant.SORTPOPULARITY;
+		} else if (rdbtnNewRadioButton_1.isSelected()) {
+			mode = Constant.SORTPRICEDESC;
 		} else {
-			lastIdx = currentPage * 20;
+			mode = Constant.SORTPRICEASC;
 		}
-		lbCurrentPage.setText("검색어 : "+ currentPage + "페이지");
-		int createCnt = 0;
-		for (int i = (currentPage - 1) * 20; i < lastIdx; i++) {
-			JPanel p = createData(mpbv.get(i));
-			p.setPreferredSize(new Dimension(230, 310));
-			dataPanel.add(p);
-			createCnt++;
-		}
-		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		if (createCnt < 3) {
-			scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-			while (createCnt < 3) {
-				JPanel nullPanel = new JPanel();
-				nullPanel.setPreferredSize(new Dimension(230, 310));
-				dataPanel.add(nullPanel);
+		mpbv = sm.selectProBySearch(trimWord, mode);
+		lbSearchResult.setText(mpbv.size() + "개 결과");
+		if (mpbv.size() > 0) {
+			lbNoData.setVisible(false);
+			int pageAmount = (int) Math.ceil(mpbv.size() / 20.0);
+			boolean isLastPage = false;
+			int lastIdx = 0;
+			pageSetting(pageAmount);
+			if (pageAmount <= currentPage) {
+				currentPage = pageAmount;
+				isLastPage = true;
+			}
+			if (isLastPage) {
+				lastIdx = mpbv.size();
+			} else {
+				lastIdx = currentPage * 20;
+			}
+			lbCurrentPage.setText("검색어 : "+ currentPage + "페이지");
+			int createCnt = 0;
+			for (int i = (currentPage - 1) * 20; i < lastIdx; i++) {
+				JPanel p = createData(mpbv.get(i));
+				p.setPreferredSize(new Dimension(230, 310));
+				dataPanel.add(p);
 				createCnt++;
 			}
+			scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+			if (createCnt < 3) {
+				scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+				while (createCnt < 3) {
+					JPanel nullPanel = new JPanel();
+					nullPanel.setPreferredSize(new Dimension(230, 310));
+					dataPanel.add(nullPanel);
+					createCnt++;
+				}
+			}
+		} else {
+			lbCurrentPage.setText("검색어 : "+ currentPage + "페이지");
+			pageSetting(1);
+			lbNoData.setVisible(true);
 		}
 		repaint();
 		validate();
@@ -540,6 +741,10 @@ public class Mainpage extends JFrame implements ActionListener {
 		ic = new ImageIcon(img2);
 		return ic;
 	}
+	
+	public void togglePopUp() {
+		new Thread(this).start();
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -574,9 +779,52 @@ public class Mainpage extends JFrame implements ActionListener {
 						break;
 					}
 				}
-				JOptionPane.showMessageDialog(null, mpb.getProName() + "\n제품 상세페이지 이동", "안내",
-						JOptionPane.INFORMATION_MESSAGE);
+				productInfo pi = productInfo.getInstance();
+				pi.refresh(mpb.getPb(), mem);
+				pi.setLocationRelativeTo(mp);
+				pi.setVisible(true);
+				dispose();
 			}
+		}
+	}
+
+	@Override
+	public void run() {
+		for (int i = 0; i < mpbv.size(); i++) {
+			mpbv.get(i).getBtn().setEnabled(isPopUp);
+		}
+		for (int i = 0; i < pageBtns.size(); i++) {
+			pageBtns.get(i).setEnabled(isPopUp);
+		}
+		Component[] components = layeredPane.getComponents();
+		for (Component component : components) {
+		    component.setEnabled(isPopUp);
+		}
+		if (isPopUp) {
+			scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		} else {
+			scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		}
+		try {
+			if (isPopUp) {
+				isPopUp = !isPopUp;
+				btnClosePopUp.setEnabled(false);
+				for (int i = 0; i < 150; i++) {
+					int x = panelPopUp.getX() + 1;
+					panelPopUp.setLocation(x, panelPopUp.getY());
+					Thread.sleep((long) Math.pow(i/50, 2));
+				}
+			} else {
+				isPopUp = !isPopUp;
+				for (int i = 0; i < 150; i++) {
+					int x = panelPopUp.getX() - 1;
+					panelPopUp.setLocation(x, panelPopUp.getY());
+					Thread.sleep((long) Math.pow(i/50, 2));
+				}
+				btnClosePopUp.setEnabled(true);
+			}
+		} catch (Exception e) {
+			e.getStackTrace();
 		}
 	}
 }

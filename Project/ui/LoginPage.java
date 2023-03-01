@@ -13,6 +13,8 @@ import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import java.awt.Color;
+
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
@@ -20,6 +22,7 @@ import javax.swing.JOptionPane;
 import java.awt.Cursor;
 import javax.swing.border.EmptyBorder;
 
+import project.bean.CustomMethod;
 import project.bean.MemberBean;
 import project.db.ShopMgr;
 
@@ -37,6 +40,7 @@ public class LoginPage extends JFrame implements ActionListener{
 	private JPasswordField tfPw;
 	private JButton btnLogin;
 	private ShopMgr sm = ShopMgr.getInstance();
+	private CustomMethod cm = new CustomMethod();
 
 	/**
 	 * Launch the application.
@@ -80,7 +84,7 @@ public class LoginPage extends JFrame implements ActionListener{
 		getContentPane().add(panel);
 		panel.setLayout(null);
 
-		tfId = new JTextField("admin");
+		tfId = new JTextField("");
 		tfId.setOpaque(false);
 		tfId.setFont(new Font("굴림", Font.PLAIN, 23));
 		tfId.setBounds(39, 151, 306, 43);
@@ -188,6 +192,7 @@ public class LoginPage extends JFrame implements ActionListener{
 				bj = new ImageIcon(imgBtnJoin);
 				btnJoin.setIcon(bj);
 				SignUpPage sup = SignUpPage.getInstance();
+				sup.setLocationRelativeTo(lp);
 				sup.setVisible(true);
 				dispose();
 			}
@@ -237,14 +242,15 @@ public class LoginPage extends JFrame implements ActionListener{
 		if (sm.login(tfId.getText(), new String(tfPw.getPassword()))) {
 			MemberBean mb = new MemberBean();
 			mb = sm.selectMember(tfId.getText(), new String(tfPw.getPassword()));
-			JOptionPane.showMessageDialog(null, "로그인 성공");
+			JOptionPane.showMessageDialog(lp, "로그인 성공");
 			Mainpage mp = Mainpage.getInstance();
 			mp.refresh(mb);
+			mp.setLocationRelativeTo(lp);
 			mp.setVisible(true);
 			tfPw.setText("");
 			dispose();
 		} else {
-			JOptionPane.showMessageDialog(null, "로그인 실패");
+			JOptionPane.showMessageDialog(lp, "로그인 실패");
 		}
 	}
 }
