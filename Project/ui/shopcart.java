@@ -28,22 +28,13 @@ import java.awt.Dimension;
 import java.awt.SystemColor;
 import java.awt.Font;
 
-<<<<<<< HEAD:Project/ui/shopcart.java
-public class shopcart extends JFrame implements ChangeListener, ActionListener{
-=======
 public class Shopcart extends JFrame implements ChangeListener, ActionListener, Runnable {
->>>>>>> 2e31d6211e926b535d439a23067bc5f0b7a9770d:Project/UI/shopcart.java
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-<<<<<<< HEAD:Project/ui/shopcart.java
-	private static shopcart sc;
-//	JScrollPane scrollPane;
-=======
 	private static Shopcart sc;
 	private JScrollPane sp;
->>>>>>> 2e31d6211e926b535d439a23067bc5f0b7a9770d:Project/UI/shopcart.java
 	ImageIcon icon;
 	JPanel dataPanel;
 	ShopMgr sm;
@@ -56,13 +47,6 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener, 
 	private JLabel totalPriceLb;
 	public int prePage;
 	private long totalPrice;
-<<<<<<< HEAD:Project/ui/shopcart.java
-	
-	public static shopcart getInstance() {
-		if (sc == null) {
-			sc = new shopcart(new MemberBean());
-		} return sc;
-=======
 	private boolean isPopUp;
 	private JPanel background;
 	private JPanel panelPopUp;
@@ -77,7 +61,6 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener, 
 			sc = new Shopcart(new MemberBean());
 		}
 		return sc;
->>>>>>> 2e31d6211e926b535d439a23067bc5f0b7a9770d:Project/UI/shopcart.java
 	}
 
 	public void refresh(MemberBean mem, int prePage) {
@@ -91,13 +74,8 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener, 
 		sm.updateMember(mem);
 		addData();
 	}
-<<<<<<< HEAD:Project/ui/shopcart.java
-	
-	private shopcart(MemberBean mem) {
-=======
 
 	private Shopcart(MemberBean mem) {
->>>>>>> 2e31d6211e926b535d439a23067bc5f0b7a9770d:Project/UI/shopcart.java
 		setIconImage(Toolkit.getDefaultToolkit().getImage("./IMG\\LogoIcon.png"));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(420, 665);

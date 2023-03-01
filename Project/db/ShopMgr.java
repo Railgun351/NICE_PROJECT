@@ -1199,46 +1199,37 @@ public class ShopMgr {
 		} finally {
 			pool.freeConnection(con, pstmt);
 		}
-<<<<<<< HEAD
-		
-		// 아이디 중복확인
-		public boolean idCheck (String id) {
+
+		return cateIdx;
+
+	}
+	
+	// 아이디 중복확인
+		public boolean idCheck(String id) {
 			Connection con = null;
 			PreparedStatement pstmt = null;
 			String sql = null;
 			ResultSet rs = null;
 			boolean flag = false;
-			
+
 			try {
 				con = pool.getConnection();
 				sql = "select id from member where id = ?";
 				pstmt = con.prepareStatement(sql);
 				pstmt.setString(1, id);
 				rs = pstmt.executeQuery();
-				
-				if(rs.next()) {
-					flag = true; //중복
+
+				if (rs.next()) {
+					flag = true; // 중복
 				}
-				
-				
+
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(null, e.getMessage());
 				e.printStackTrace();
-			}finally {
+			} finally {
 				pool.freeConnection(con, pstmt);
 			}
 			return flag;
-			
-			
-	
-			
 		}
-
-=======
-
-		return cateIdx;
-
-	}
 	// 서수정 끝
->>>>>>> 2e31d6211e926b535d439a23067bc5f0b7a9770d
 }

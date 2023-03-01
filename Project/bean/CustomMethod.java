@@ -17,12 +17,9 @@ public class CustomMethod {
 	
 	public String toWon(long Amount) {
 		StringBuilder sb = new StringBuilder();
-<<<<<<< HEAD:Project/bean/CustomMethod.java
-=======
 		if (Amount == 0) {
 			sb.append("0");
 		}
->>>>>>> 2e31d6211e926b535d439a23067bc5f0b7a9770d:Project/Bean/CustomMethod.java
 		while (true) {
 			if (Amount > (long)Math.pow(10, 12)) {
 				sb.append((long)Math.floor(Amount/(long)Math.pow(10, 12))+"조");

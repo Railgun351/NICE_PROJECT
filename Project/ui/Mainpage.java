@@ -404,14 +404,9 @@ public class Mainpage extends JFrame implements ActionListener,Runnable {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				btnCart.setIcon(resizeIcon(new ImageIcon("./IMG\\\\CartNull.png"), 40, 40));
-<<<<<<< HEAD:Project/ui/Mainpage.java
-				shopcart sc = shopcart.getInstance();
-				sc.refresh(mp.mem);
-=======
 				Shopcart sc = Shopcart.getInstance();
 				sc.refresh(mp.mem, Constant.PREPAGEMAIN);
 				sc.setLocationRelativeTo(mp);
->>>>>>> 2e31d6211e926b535d439a23067bc5f0b7a9770d:Project/UI/Mainpage.java
 				sc.setVisible(true);
 				dispose();
 			}

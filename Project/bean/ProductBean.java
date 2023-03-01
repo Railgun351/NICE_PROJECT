@@ -1,6 +1,5 @@
 package project.bean;
 
-
 public class ProductBean {
 	private int proIdx;
 	private String proName;

@@ -25,10 +25,6 @@
 /Constant.class
 /CustomMethod.class
 /MainProductBean.class
-<<<<<<< HEAD:Project/bean/.gitignore
-/CustomMethod.class
-=======
 /MemberBean.class
 /OrderLogBean.class
 /ReviewBean.class
->>>>>>> 2e31d6211e926b535d439a23067bc5f0b7a9770d:Project/Bean/.gitignore
