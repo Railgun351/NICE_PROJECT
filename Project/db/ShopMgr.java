@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import project.bean.CartBean;
 import project.bean.MainProductBean;
@@ -867,5 +868,38 @@ public class ShopMgr {
 			
 			
 		}
-	// 서수정 끝
+		
+		// 아이디 중복확인
+		public boolean idCheck (String id) {
+			Connection con = null;
+			PreparedStatement pstmt = null;
+			String sql = null;
+			ResultSet rs = null;
+			boolean flag = false;
+			
+			try {
+				con = pool.getConnection();
+				sql = "select id from member where id = ?";
+				pstmt = con.prepareStatement(sql);
+				pstmt.setString(1, id);
+				rs = pstmt.executeQuery();
+				
+				if(rs.next()) {
+					flag = true; //중복
+				}
+				
+				
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(null, e.getMessage());
+				e.printStackTrace();
+			}finally {
+				pool.freeConnection(con, pstmt);
+			}
+			return flag;
+			
+			
+	
+			
+		}
+
 }

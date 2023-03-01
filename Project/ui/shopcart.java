@@ -27,12 +27,12 @@ import java.awt.Dimension;
 import java.awt.SystemColor;
 import java.awt.Font;
 
-public class Shopcart extends JFrame implements ChangeListener, ActionListener{
+public class shopcart extends JFrame implements ChangeListener, ActionListener{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static Shopcart sc;
+	private static shopcart sc;
 //	JScrollPane scrollPane;
 	ImageIcon icon;
 	JPanel dataPanel;
@@ -45,9 +45,9 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener{
 	private JLabel totalPriceLb;
 	private long totalPrice;
 	
-	public static Shopcart getInstance() {
+	public static shopcart getInstance() {
 		if (sc == null) {
-			sc = new Shopcart(new MemberBean());
+			sc = new shopcart(new MemberBean());
 		} return sc;
 	}
 	
@@ -58,7 +58,7 @@ public class Shopcart extends JFrame implements ChangeListener, ActionListener{
 		addData();
 	}
 	
-	private Shopcart(MemberBean mem) {
+	private shopcart(MemberBean mem) {
 		setIconImage(Toolkit.getDefaultToolkit().getImage("./IMG\\LogoIcon.png"));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(420, 665);

@@ -49,18 +49,18 @@ public class AddProduct extends JFrame {
 	/**
 	 * Launch the application.
 	 */
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					AddProduct window = new AddProduct();
-//					window.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					AddProduct window = new AddProduct();
+					window.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
 
 	public static AddProduct getInstance() {
 		if (ap == null) {
@@ -90,7 +90,7 @@ public class AddProduct extends JFrame {
 		tfCate.setText("");
 		tfCate.setOpaque(false);
 		tfCate.setBounds(313, 80, 149, 29);
-//		tfCate.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+		tfCate.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 		panel.add(tfCate);
 		tfCate.setColumns(10);
 
@@ -99,7 +99,7 @@ public class AddProduct extends JFrame {
 		tfName.setText("");
 		tfName.setOpaque(false);
 		tfName.setBounds(313, 194, 149, 29);
-//		tfName.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+		tfName.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 		panel.add(tfName);
 		tfName.setColumns(10);
 
@@ -108,7 +108,7 @@ public class AddProduct extends JFrame {
 		tfPrice.setText("");
 		tfPrice.setOpaque(false);
 		tfPrice.setBounds(313, 237, 149, 29);
-//		tfPrice.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+		tfPrice.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 		panel.add(tfPrice);
 		tfPrice.setColumns(10);
 
@@ -117,7 +117,7 @@ public class AddProduct extends JFrame {
 		tfInven.setText("");
 		tfInven.setOpaque(false);
 		tfInven.setBounds(313, 280, 149, 29);
-//		tfInven.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+		tfInven.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 		panel.add(tfInven);
 		tfInven.setColumns(10);
 
@@ -160,18 +160,33 @@ public class AddProduct extends JFrame {
 		img_1.setBounds(43, 331, 453, 331);
 		panel.add(img_1);
 
-		JButton btn_back = new JButton("");
-		btn_back.setIcon(resizeIcon(new ImageIcon("./IMG\\BACK.png"), 40, 40));
-		btn_back.addActionListener(new ActionListener() {
+		JButton btn_Back = new JButton("");
+		btn_Back.setContentAreaFilled(false);
+		btn_Back.setBorderPainted(false);
+		btn_Back.setIcon(resizeIcon(new ImageIcon("./IMG\\back2.png"), 40, 40));
+		btn_Back.addMouseListener(new MouseAdapter() {
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btn_Back.setIcon(resizeIcon(new ImageIcon("./IMG\\BACK.png"), 40, 40));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btn_Back.setIcon(resizeIcon(new ImageIcon("./IMG\\back2.png"), 40, 40));
+			}
+			
+			
+			
+		});
+		btn_Back.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				AdminMain am = AdminMain.getinstance();
 				am.setVisible(true);
 				dispose();
 			}
 		});
-		btn_back.setContentAreaFilled(false);
-		btn_back.setBounds(30, 30, 40, 40);
-		panel.add(btn_back);
+		btn_Back.setBounds(30, 30, 40, 40);
+		panel.add(btn_Back);
 		
 		JLabel lbLogo = new JLabel();
 		lbLogo.setBounds(80, 30, 69, 39);
@@ -328,7 +343,7 @@ public class AddProduct extends JFrame {
 
 		// 카테고리 추가 버튼
 		JButton add_cate = new JButton("");
-		add_cate.setBounds(318, 120, 149, 47);
+		add_cate.setBounds(315, 120, 149, 47);
 		ImageIcon ac = new ImageIcon("./img\\newcate1.png");
 		Image addCate = ac.getImage();
 		addCate = addCate.getScaledInstance(149, 47, Image.SCALE_SMOOTH);

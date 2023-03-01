@@ -291,7 +291,7 @@ public class Mainpage extends JFrame implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				btnCart.setIcon(resizeIcon(new ImageIcon("./IMG\\\\CartNull.png"), 40, 40));
-				Shopcart sc = Shopcart.getInstance();
+				shopcart sc = shopcart.getInstance();
 				sc.refresh(mp.mem);
 				sc.setVisible(true);
 				dispose();

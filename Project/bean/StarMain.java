@@ -1,3 +1,4 @@
+package project.bean;
 //package project.bean;
 //
 //import java.sql.SQLException;
